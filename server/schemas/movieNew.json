@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/movieNew.schema.json",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+        },
+        "year": {
+            "type": "integer",
+            "minValue": 1888,
+            "maxValue": 2025
+        },
+        "poster": {
+            "type": "string"
+        }
+    },
+    "additionalPropeties": false,
+    "required": [
+        "title"
+    ]
+}
