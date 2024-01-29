@@ -1,7 +1,10 @@
 import React from "react";
+import { Switch, Route, Redirect } from "react-router-dom";
 import Homepage from "../homepage/Homepage";
 import LoginForm from "../auth/LoginForm";
 import SignupForm from "../auth/SignupForm";
+import MovieList from "../movies/MovieList";
+import PrivateRoute from "./PrivateRoute";
 
 /** Site-wide routes.
  *
@@ -20,12 +23,26 @@ function Routes({ login, signup }) {
 
     return (
         <div className="pt-5">
-            {/* Conditional rendering for routes */}
-            {window.location.pathname === "/" && <Homepage />}
-            {window.location.pathname === "/login" && <LoginForm login={login} />}
-            {window.location.pathname === "/signup" && <SignupForm signup={signup} />}
-            {/* Redirect to homepage for any other path */}
-            {window.location.pathname !== "/" && window.location.pathname !== "/login" && window.location.pathname !== "/signup" && <Homepage />}
+            <Switch>
+                {/* Conditional rendering for routes */}
+                <Route exact path="/">
+                    <Homepage />
+                </Route>
+
+                <Route exact path="/login">
+                    <LoginForm login={login} />
+                </Route>
+
+                <Route exact path="/signup">
+                    <SignupForm signup={signup} />
+                </Route>
+
+                <PrivateRoute exact path="/movies">
+                    <MovieList />
+                </PrivateRoute>
+                {/* Redirect to homepage for any other path */}
+                <Redirect to="/" />
+            </Switch>
         </div>
     );
 }

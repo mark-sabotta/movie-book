@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { CompatRouter } from "react-router-dom-v5-compat";
 import useLocalStorage from "./hooks/useLocalStorage";
 import Navigation from "./routes-nav/Navigation";
 import Routes from "./routes-nav/Routes";
@@ -7,8 +7,7 @@ import LoadingSpinner from "./common/LoadingSpinner";
 import MovieBookApi from "./api/api";
 import UserContext from "./auth/UserContext";
 import { jwtDecode } from "jwt-decode";
-import Homepage from "./homepage/Homepage";
-import MovieList from "./movies/MovieList";
+import { BrowserRouter } from "react-router-dom";
 
 // Key name for storing token in localStorage for "remember me" re-login
 export const TOKEN_STORAGE_ID = "moviebook-token";
@@ -35,7 +34,6 @@ function App() {
   const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
 
 
-  console.log("I ran");
   console.debug(
     "App",
     "infoLoaded=", infoLoaded,
@@ -130,9 +128,17 @@ function App() {
 
 
   return (
-    <div className="App">
-      <MovieList />
-    </div>
+    <BrowserRouter>
+      <CompatRouter>
+        <UserContext.Provider
+          value={{ currentUser, setCurrentUser }}>
+          <div>
+            <Navigation logout={logout} />
+            <Routes login={login} signup={signup} />
+          </div>
+        </UserContext.Provider>
+      </CompatRouter>
+    </BrowserRouter>
   );
 }
 

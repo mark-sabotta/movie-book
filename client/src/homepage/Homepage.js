@@ -13,8 +13,7 @@ import UserContext from "../auth/UserContext";
  */
 
 function Homepage() {
-    //const { currentUser } = useContext(UserContext);
-    let currentUser = {username: "bob"};
+    const { currentUser } = useContext(UserContext);
     console.debug("Homepage", "currentUser=", currentUser);
 
     return (

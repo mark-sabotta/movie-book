@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useHistory} from "react-router-dom";
 import Alert from "../common/Alert";
 
 /** Signup form.
@@ -14,7 +14,7 @@ import Alert from "../common/Alert";
  */
 
 function SignupForm({ signup }) {
-    const navigate = useNavigate();
+    const history = useHistory();
     const [formData, setFormData] = useState({
         username: "",
         password: "",
@@ -40,7 +40,7 @@ function SignupForm({ signup }) {
         evt.preventDefault();
         let result = await signup(formData);
         if (result.success) {
-            navigate("/");
+            history.push("/");
         } else {
             setFormErrors(result.errors);
         }
@@ -79,24 +79,6 @@ function SignupForm({ signup }) {
                                 />
                             </div>
 
-                            <div className="form-group">
-                                <label>First name</label>
-                                <input
-                                    name="firstName"
-                                    className="form-control"
-                                    value={formData.firstName}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Last name</label>
-                                <input
-                                    name="lastName"
-                                    className="form-control"
-                                    value={formData.lastName}
-                                    onChange={handleChange}
-                                />
-                            </div>
                             <div className="form-group">
                                 <label>Email</label>
                                 <input

@@ -1,7 +1,8 @@
 import axios from "axios";
-import {X_RAPID_KEY, X_RAPID_HOST} from "../.env";
+import env from "../env";
 
-//const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
 
 class MovieBookApi {
     // the token for interactive with the API will be stored here.
@@ -9,21 +10,19 @@ class MovieBookApi {
 
     static async request(endpoint, data = {}, method = "get") {
         console.debug("API Call:", endpoint, data, method);
-        //const url = `${BASE_URL}/${endpoint}`;
-        //const headers = { Authorization: `Bearer ${MovieBookApi.token}` };
-        //const params = (method === "get")
-        //? data
-        //: {};
+        const url = `${BASE_URL}/${endpoint}`;
+        const headers = { Authorization: `Bearer ${MovieBookApi.token}` };
+        const params = (method === "get")
+            ? data
+            : {};
 
-        //try {
-        //const results = await axios({ url, method, data, params, headers }).data;
-        //console.log(results);
-        return {}
-        //} catch (err) {
-        //console.error("API Error:", err.response);
-        //let message = err.response.data.error.message;
-        //throw Array.isArray(message) ? message : [message];
-        //}
+        try {
+            return await axios({ url, method, data, params, headers }).data;
+        } catch (err) {
+            console.error("API Error:", err.response);
+            let message = err.response.data.error.message;
+            throw Array.isArray(message) ? message : [message];
+        }
     }
 
     static async getCurrentUser(username) {
@@ -65,8 +64,8 @@ class MovieBookApi {
                 page: '1'
             },
             headers: {
-                'X-RapidAPI-Key': X_RAPID_KEY,
-                'X-RapidAPI-Host': X_RAPID_HOST
+                'X-RapidAPI-Key': env.X_RAPID_KEY,
+                'X-RapidAPI-Host': env.X_RAPID_HOST
             }
         };
 
