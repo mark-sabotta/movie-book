@@ -53,7 +53,7 @@ class User {
      **/
 
     static async register(
-        { username, password, firstName, lastName, email, isAdmin }) {
+        { username, password, email}) {
         const duplicateCheck = await pool.query(
             `SELECT username
            FROM users

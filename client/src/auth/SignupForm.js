@@ -18,8 +18,6 @@ function SignupForm({ signup }) {
     const [formData, setFormData] = useState({
         username: "",
         password: "",
-        firstName: "",
-        lastName: "",
         email: "",
     });
     const [formErrors, setFormErrors] = useState([]);
