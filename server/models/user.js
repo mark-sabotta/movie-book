@@ -2,6 +2,7 @@
 
 const pool = require("../db");
 const bcrypt = require("bcrypt");
+const mysql = require("mysql2");
 const {
     NotFoundError,
     BadRequestError,
@@ -15,7 +16,7 @@ const { BCRYPT_WORK_FACTOR } = require("../config.js");
 class User {
     /** authenticate user with username, password.
      *
-     * Returns { username, first_name, last_name, email, is_admin }
+     * Returns { username, email }
      *
      * Throws UnauthorizedError is user not found or wrong password.
      **/
@@ -25,13 +26,12 @@ class User {
         const result = await pool.query(
             `SELECT username,
                   password,
-                  email,
+                  email
            FROM users
-           WHERE username = $1`,
-            [username],
-        );
+           WHERE username = ?
+           `, [username]);
 
-        const user = result.rows[0];
+        const user = result[0][0];
 
         if (user) {
             // compare hashed password to a new hash from password
@@ -47,33 +47,32 @@ class User {
 
     /** Register user with data.
      *
-     * Returns { username, firstName, lastName, email, isAdmin }
+     * Returns { username, email }
      *
      * Throws BadRequestError on duplicates.
      **/
 
     static async register(
-        { username, password, email}) {
+        { username, password, email }) {
         const duplicateCheck = await pool.query(
             `SELECT username
            FROM users
-           WHERE username = $1`,
-            [username],
+           WHERE username = ?`,
+            [username]
         );
 
-        if (duplicateCheck.rows[0]) {
+        if (duplicateCheck[0][0]) {
             throw new BadRequestError(`Duplicate username: ${username}`);
         }
 
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
-        const result = await pool.query(
+        await pool.query(
             `INSERT INTO users
            (username,
             password,
             email)
-           VALUES ($1, $2, $3)
-           RETURNING username, email`,
+           VALUES (?, ?, ?)`,
             [
                 username,
                 hashedPassword,
@@ -81,21 +80,26 @@ class User {
             ],
         );
 
-        const user = result.rows[0];
+        const userRes = await pool.query(
+            `SELECT username, email FROM users WHERE username = ?`,
+            [username]
+        );
+
+        const user = userRes[0][0];
 
         return user;
     }
 
     /** Find all users.
      *
-     * Returns [{ username, first_name, last_name, email, is_admin }, ...]
+     * Returns [{ username, email }, ...]
      **/
 
 
     /** Given a username, return data about user.
      *
-     * Returns { username, first_name, last_name, is_admin, jobs }
-     *   where jobs is { id, title, company_handle, company_name, state }
+     * Returns { username }
+     *   
      *
      * Throws NotFoundError if user not found.
      **/
@@ -105,20 +109,20 @@ class User {
             `SELECT username,
                   email
            FROM users
-           WHERE username = $1`,
+           WHERE username = ?`,
             [username],
         );
 
-        const user = userRes.rows[0];
+        const user = userRes[0][0];
 
         if (!user) throw new NotFoundError(`No user: ${username}`);
 
         const userRatingsRes = await pool.query(
             `SELECT r.imdbid
            FROM ratings AS r
-           WHERE r.username = $1`, [username]);
+           WHERE r.username = ?`, [username]);
 
-        user.applications = userApplicationsRes.rows.map(a => a.job_id);
+        user.ratings = userRatingsRes.rows.map(a => a.movie_id);
         return user;
     }
 
@@ -128,13 +132,13 @@ class User {
      * all the fields; this only changes provided ones.
      *
      * Data can include:
-     *   { firstName, lastName, password, email, isAdmin }
+     *   { username, password, email }
      *
-     * Returns { username, firstName, lastName, email, isAdmin }
+     * Returns { username, email }
      *
      * Throws NotFoundError if not found.
      *
-     * WARNING: this function can set a new password or make a user an admin.
+     * WARNING: this function can set a new password.
      * Callers of this function must be certain they have validated inputs to this
      * or a serious security risks are opened.
      */
@@ -147,22 +151,18 @@ class User {
         const { setCols, values } = sqlForPartialUpdate(
             data,
             {
-                firstName: "first_name",
-                lastName: "last_name",
-                isAdmin: "is_admin",
+                username: "username"
             });
-        const usernameVarIdx = "$" + (values.length + 1);
 
-        const querySql = `UPDATE users 
-                      SET ${setCols} 
-                      WHERE username = ${usernameVarIdx} 
-                      RETURNING username,
-                                first_name AS "firstName",
-                                last_name AS "lastName",
-                                email,
-                                is_admin AS "isAdmin"`;
+        const querySql = `UPDATE users SET ${setCols} WHERE username = ?`;
         const result = await db.query(querySql, [...values, username]);
-        const user = result.rows[0];
+
+        // Retrieve updated user data using a separate query
+        const userRes = await pool.query(
+            `SELECT username, email FROM users WHERE username = ?`,
+            [username]
+        );
+        const user = userRes[0][0];
 
         if (!user) throw new NotFoundError(`No user: ${username}`);
 
@@ -176,42 +176,39 @@ class User {
         let result = await db.query(
             `DELETE
            FROM users
-           WHERE username = $1
-           RETURNING username`,
+           WHERE username = ?`,
             [username],
         );
-        const user = result.rows[0];
 
-        if (!user) throw new NotFoundError(`No user: ${username}`);
     }
 
-    /** Apply for job: update db, returns undefined.
+    /** Rate a movie: update db, returns undefined.
      *
-     * - username: username applying for job
-     * - jobId: job id
+     * - username: username rating movie
+     * - movieId: IMDB id
      **/
 
-    static async applyToJob(username, jobId) {
-        const confirmJob = await db.query(
+    static async rateMovie(username, movieId, rating) {
+        const confirmMovie = await db.query(
             `SELECT id
-           FROM jobs
-           WHERE id = $1`, [jobId]);
-        const job = confirmJob.rows[0];
+           FROM movies
+           WHERE id = ?`, [movieId]);
+        const movie = confirmMovie.rows[0];
 
-        if (!job) throw new NotFoundError(`No job: ${jobId}`);
+        if (!movie) throw new NotFoundError(`No movie: ${movieId}`);
 
         const confirmUser = await db.query(
             `SELECT username
            FROM users
-           WHERE username = $1`, [username]);
+           WHERE username = ?`, [username]);
         const user = confirmUser.rows[0];
 
         if (!user) throw new NotFoundError(`No username: ${username}`);
 
         await db.query(
-            `INSERT INTO applications (job_id, username)
-           VALUES ($1, $2)`,
-            [jobId, username]);
+            `INSERT INTO ratings (username, imdbid, rating)
+           VALUES (?, ?, ?)`,
+            [username, movieId, rating]);
     }
 }
 

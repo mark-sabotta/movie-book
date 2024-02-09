@@ -5,6 +5,8 @@ import LoginForm from "../auth/LoginForm";
 import SignupForm from "../auth/SignupForm";
 import MovieList from "../movies/MovieList";
 import PrivateRoute from "./PrivateRoute";
+import MovieDetail from "../movies/MovieDetail";
+
 
 /** Site-wide routes.
  *
@@ -39,6 +41,10 @@ function Routes({ login, signup }) {
 
                 <PrivateRoute exact path="/movies">
                     <MovieList />
+                </PrivateRoute>
+
+                <PrivateRoute exact path="/movies/:imdbid">
+                    <MovieDetail />
                 </PrivateRoute>
                 {/* Redirect to homepage for any other path */}
                 <Redirect to="/" />

@@ -61,10 +61,10 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
 
 /** GET /[username] => { user }
  *
- * Returns { username, firstName, lastName, isAdmin, jobs }
- *   where jobs is { id, title, companyHandle, companyName, state }
+ * Returns { username, ratings }
+ *   where ratings is { movie_id, rating }
  *
- * Authorization required: admin or same user-as-:username
+ * Authorization required: same user-as-:username
  **/
 
 router.get("/:username", ensureLoggedIn, async function (req, res, next) {
@@ -84,7 +84,7 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
  *
  * Returns { username, email, email }
  *
- * Authorization required: admin or same-user-as-:username
+ * Authorization required: same-user-as-:username
  **/
 
 router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
@@ -105,7 +105,7 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: admin or same-user-as-:username
+ * Authorization required: same-user-as-:username
  **/
 
 router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
@@ -118,18 +118,18 @@ router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
 });
 
 
-/** POST /[username]/ratings/[id]  { state } => { rating }
+/** POST /[username]/ratings/[id]  { movie } => { rating }
  *
  * Returns {"rated": imdbId}
  *
- * Authorization required: admin or same-user-as-:username
+ * Authorization required: same-user-as-:username
  * */
 
 router.post("/:username/ratings/:id", ensureLoggedIn, async function (req, res, next) {
     try {
-        const jobId = +req.params.id;
-        await User.rateMovie(req.params.username, jobId);
-        return res.json({ applied: jobId });
+        const movieId = +req.params.id;
+        await User.rateMovie(req.params.username, movieId);
+        return res.json({ rated: movieId });
     } catch (err) {
         return next(err);
     }

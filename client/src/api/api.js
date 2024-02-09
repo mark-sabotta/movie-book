@@ -78,6 +78,27 @@ class MovieBookApi {
             console.error(error);
         }
     }
+
+    static async getMovieGenre(imdbid) {
+        const url = `${env.MOVIE_DB_BASE_URL}${imdbid}?${env.MOVIE_DB_SOURCE}`;
+        const options = {
+            method: 'GET',
+            url: url,
+            headers: {
+                accept: 'application/json',
+                Authorization: env.THE_MOVIE_DB_AUTH
+            }
+        };
+
+        try {
+            console.log(options);
+            const response = await axios.request(options);
+            console.log(response.data.movie_results[0]);
+            return (response.data.movie_results[0]);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 }
 
 
