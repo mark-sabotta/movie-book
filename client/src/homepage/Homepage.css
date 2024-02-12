@@ -1,6 +1,13 @@
 .Homepage {
-    /* put around the vertical center of page */
-    height: calc(100vh - 150px);
     display: flex;
+    flex-direction: row;
     align-items: center;
+}
+
+.Homepage .LogoBox {
+    background-color: red;
+    color: white;
+    width: 250px;
+    left:100px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }

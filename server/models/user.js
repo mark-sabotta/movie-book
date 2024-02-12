@@ -105,7 +105,7 @@ class User {
      **/
 
     static async get(username) {
-        const userRes = await db.query(
+        const userRes = await pool.query(
             `SELECT username,
                   email
            FROM users
@@ -122,7 +122,7 @@ class User {
            FROM ratings AS r
            WHERE r.username = ?`, [username]);
 
-        user.ratings = userRatingsRes.rows.map(a => a.movie_id);
+        //user.ratings = userRatingsRes.rows.map(a => a.movie_id);
         return user;
     }
 

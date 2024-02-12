@@ -1,17 +1,17 @@
 import React from "react";
 //import { Link } from "react-router-dom";
 
-import "./MovieCard.css";
+import "./UserMovieCard.css";
 
-/** Show limited information about a movie
+/** Show limited information about a movie the user has rated
  *
- * Is rendered by MovieList to show a "card" for each movie.
+ * Is rendered by the Homepage to show a "card" for each rated movie.
  *
- * MovieList -> MovieCard
+ * Homepage -> UserMovieCard
  */
 
-function MovieCard({ title, image, imdbid }) {
-    console.debug("MovieCard", image);
+function UserMovieCard({ title, image, imdbid, rating }) {
+    console.debug("UserMovieCard", image);
 
     return (
         <a className="MovieCard card" href={`/movies/${imdbid}`}>
@@ -22,9 +22,10 @@ function MovieCard({ title, image, imdbid }) {
                         alt={title}
                         className="float-right ml-5" />}
                 </h6>
+                <p><small>⭐⭐⭐★★</small></p>
             </div>
         </a>
     );
 }
 
-export default MovieCard;
+export default UserMovieCard;

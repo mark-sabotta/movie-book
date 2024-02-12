@@ -16,11 +16,12 @@ import MovieDetail from "../movies/MovieDetail";
  * Visiting a non-existant route redirects to the homepage.
  */
 
-function Routes({ login, signup }) {
+function Routes({ login, signup, rate }) {
     console.debug(
         "Routes",
         `login=${typeof login}`,
-        `register=${typeof register}`,
+        `signup=${typeof signup}`,
+        `rate=${typeof rate}`,
     );
 
     return (
@@ -44,7 +45,7 @@ function Routes({ login, signup }) {
                 </PrivateRoute>
 
                 <PrivateRoute exact path="/movies/:imdbid">
-                    <MovieDetail />
+                    <MovieDetail rate={rate}/>
                 </PrivateRoute>
                 {/* Redirect to homepage for any other path */}
                 <Redirect to="/" />

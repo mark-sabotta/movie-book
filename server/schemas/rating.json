@@ -3,22 +3,26 @@
     "$id": "http://example.com/movieNew.schema.json",
     "type": "object",
     "properties": {
-        "title": {
+        "username": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 50
+            "maxLength": 30
         },
         "imdbid": {
             "type": "string",
             "minLength": 1,
             "maxLength": 15
         },
-        "poster": {
-            "type": "string"
+        "score": {
+            "type": "integer",
+            "minValue": 1,
+            "maxValue": 5
         }
     },
     "additionalPropeties": false,
     "required": [
-        "title", "imdbid"
+        "username",
+        "imdbid",
+        "score"
     ]
 }

@@ -8,6 +8,7 @@ class MovieBookApi {
     // the token for interactive with the API will be stored here.
     static token;
 
+
     static async request(endpoint, data = {}, method = "get") {
         console.debug("API Call:", endpoint, data, method);
         const url = `${BASE_URL}/${endpoint}`;
@@ -17,7 +18,9 @@ class MovieBookApi {
             : {};
 
         try {
-            return await axios({ url, method, data, params, headers }).data;
+            const result = await axios({ url, method, data, params, headers });
+            console.log(result);
+            return result.data;
         } catch (err) {
             console.error("API Error:", err.response);
             let message = err.response.data.error.message;
@@ -70,9 +73,7 @@ class MovieBookApi {
         };
 
         try {
-            console.log(options);
             const response = await axios.request(options);
-            console.log(response.data.Search);
             return (response.data.Search);
         } catch (error) {
             console.error(error);
@@ -91,13 +92,16 @@ class MovieBookApi {
         };
 
         try {
-            console.log(options);
             const response = await axios.request(options);
-            console.log(response.data.movie_results[0]);
             return (response.data.movie_results[0]);
         } catch (error) {
             console.error(error);
         }
+    }
+    
+    static async rateMovie(data){
+        let res = await this.request(`ratings/${data.imdbid}/${data.username}/${data.score}`, data, "post");
+        return res.user;
     }
 }
 

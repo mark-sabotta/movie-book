@@ -33,7 +33,6 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
 
-
   console.debug(
     "App",
     "infoLoaded=", infoLoaded,
@@ -116,9 +115,9 @@ function App() {
   }
 
   /** Rate movie: make API call and update set of movie rating IDs. */
-  function rateMovie(id) {
+  function rateMovie(id, score) {
     if (hasRatedMovie(id)) return;
-    MovieBookApi.rateMovie(currentUser.username, id);
+    MovieBookApi.rateMovie(currentUser.username, id, score);
     setMovieRatingIds(new Set([...movieRatingIds, id]));
   }
 
@@ -134,7 +133,7 @@ function App() {
           value={{ currentUser, setCurrentUser }}>
           <div>
             <Navigation logout={logout} />
-            <Routes login={login} signup={signup} />
+            <Routes login={login} signup={signup} rate={rateMovie}/>
           </div>
         </UserContext.Provider>
       </CompatRouter>
