@@ -13,7 +13,7 @@ const rating = require("../schemas/rating.json")
 const router = express.Router();
 
 
-/** POST /ratings/[imdbid]/[username]/[score]  => { imdbid }
+/** POST /ratings/ {imdbid, username, score}  => { imdbid }
  *
  * Adds a new user movie rating.
  *
@@ -21,7 +21,7 @@ const router = express.Router();
  *
  **/
 
-router.post("/:imdbid/:username/:score", ensureLoggedIn, async function (req, res, next) {
+router.post("/", ensureLoggedIn, async function (req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, rating);
         if (!validator.valid) {
@@ -37,16 +37,24 @@ router.post("/:imdbid/:username/:score", ensureLoggedIn, async function (req, re
 });
 
 
-/** DELETE /delete/[imdbid]/[username]  =>  { deleted: imdbid }
+/** DELETE /ratings/delete {imdbid, username}  =>  { deleted: imdbid }
  *
- * Authorization required: same-user-as-:username
+ * Authorization required: same-user-as-username
  **/
 
-router.delete("/delete/:imdbid/:username", ensureLoggedIn, async function (req, res, next) {
+router.delete("/delete", ensureLoggedIn, async function (req, res, next) {
     try {
-        await Rating.remove(req.params.imdbid, req.params.username);
-        return res.json({ deleted: req.params.imdbid });
+        const validator = jsonschema.validate(req.body, rating);
+        if (!validator.valid) {
+            const errs = validator.errors.map(e => e.stack);
+            throw new BadRequestError(errs);
+        }
+        
+        await Rating.remove(req.body.imdbid, req.body.username);
+        return res.json({ deleted: req.body.imdbid });
     } catch (err) {
         return next(err);
     }
 });
+
+module.exports = router;

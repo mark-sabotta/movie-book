@@ -1,0 +1,20 @@
+.rating-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.rating-container span {
+    cursor: pointer;
+    font-size: 24px;
+    color: gray;
+    transition: none;
+}
+
+.star {
+    display: inline-block;
+    /* Ensures proper spacing between stars */
+}
+
+.rating-container .active {
+    color: gold;
+}

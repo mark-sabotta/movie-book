@@ -20,15 +20,10 @@ CREATE TABLE ratings (
   PRIMARY KEY (username, imdbid)
 );
 
-CREATE TABLE genres (
-  id INTEGER PRIMARY KEY,
-  genre VARCHAR(25)
-);
 
 CREATE TABLE movie_genres (
+  id INTEGER PRIMARY KEY,
   imdbid VARCHAR(25)
-    REFERENCES movies ON DELETE CASCADE,
+    REFERENCES movies(imdbid) ON DELETE CASCADE,
   genre_id INTEGER
-    REFERENCES genres(id) ON DELETE CASCADE,
-  PRIMARY KEY (imdbid, genre_id)
 );

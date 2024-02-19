@@ -5,7 +5,7 @@ import env from "../env";
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
 
 class MovieBookApi {
-    // the token for interactive with the API will be stored here.
+    // the token for interaction with the API will be stored here.
     static token;
 
 
@@ -35,7 +35,6 @@ class MovieBookApi {
 
     /** Get token for login from username, password. */
 
-
     static async login(data) {
         let res = await this.request(`auth/token`, data, "post");
         return res.token;
@@ -55,7 +54,21 @@ class MovieBookApi {
         return res.user;
     }
 
+    /** Sends search results of movies to be added to the database */
 
+    static async addMoviesToDB(data) {
+        let res = await this.request(`movies`, data, "post");
+        return res.Search;
+    }
+
+    /** Sends user's rating of a movie to be added to the database */
+
+    static async rateMovie(data){
+        let res = await this.request(`ratings`, data, "post");
+        return res.user;
+    }
+
+    /** Searches X-Rapid MovieDatabaseAlternative API  */
     static async getMovies(str) {
         const options = {
             method: 'GET',
@@ -74,12 +87,14 @@ class MovieBookApi {
 
         try {
             const response = await axios.request(options);
-            return (response.data.Search);
+            return (response.data);
         } catch (error) {
             console.error(error);
         }
     }
 
+
+    /** Searches TheMovieDatabase API */
     static async getMovieGenre(imdbid) {
         const url = `${env.MOVIE_DB_BASE_URL}${imdbid}?${env.MOVIE_DB_SOURCE}`;
         const options = {
@@ -98,11 +113,7 @@ class MovieBookApi {
             console.error(error);
         }
     }
-    
-    static async rateMovie(data){
-        let res = await this.request(`ratings/${data.imdbid}/${data.username}/${data.score}`, data, "post");
-        return res.user;
-    }
+
 }
 
 

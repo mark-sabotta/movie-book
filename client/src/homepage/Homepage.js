@@ -16,21 +16,21 @@ import MovieCard from "../movies/MovieCard";
 
 function Homepage() {
     const { currentUser } = useContext(UserContext);
-    const userMovies = currentUser.ratings || {};
+    const userMovies = {};
     console.debug("Homepage", "currentUser=", currentUser);
 
     return (
         <div className="Homepage">
             <div className="container text-center">
-                <h1 className="LogoBox font-weight-bold">MovieBook</h1>
-                <hr></hr>
+        
                 {currentUser
                     ?
                     <div>
                         <h4>
                             Welcome Back, {currentUser.username}!
                         </h4>
-                        <a href="/movies">Rate Movies</a>
+                        <hr></hr>
+                        <h3>Rate movies to get recommended more:</h3> <a href="/movies">Search for movies</a>
                         <br />
                         <h3>Your ratings:</h3>
                         <div className="MovieList col-md-8 offset-md-2">

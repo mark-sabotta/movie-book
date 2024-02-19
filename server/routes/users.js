@@ -11,6 +11,7 @@ const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
+const ratingSchema = require("../schemas/rating.json")
 
 const router = express.Router();
 
@@ -102,22 +103,40 @@ router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
 });
 
 
-/** POST /[username]/ratings/[id]  { movie } => { rating }
+/** POST /[username]/ratings/[imdbid]/[score]  { movie } => { rating }
  *
  * Returns {"rated": imdbId}
  *
  * Authorization required: same-user-as-:username
  * */
 
-router.post("/:username/ratings/:id", ensureLoggedIn, async function (req, res, next) {
+router.post("/:username/ratings/:imdbid/:rating", ensureLoggedIn, async function (req, res, next) {
     try {
-        const movieId = +req.params.id;
-        await User.rateMovie(req.params.username, movieId);
-        return res.json({ rated: movieId });
+        const rating = +req.params.rating;
+        const validator = jsonschema.validate(req.body, ratingSchema);
+        if (!validator.valid) {
+            const errs = validator.errors.map(e => e.stack);
+            throw new BadRequestError(errs);
+        }
+        await User.rateMovie(req.params.username, req.params.id, rating);
+        return res.json({ rated: imdbid });
     } catch (err) {
         return next(err);
     }
 });
 
+/** DELETE /[username]/ratings/delete/[imdbid]  =>  { deleted: imdbid }
+ *
+ * Authorization required: same-user-as-:username
+ **/
+
+router.delete("/:username/ratings/delete/:imdbid", ensureLoggedIn, async function (req, res, next) {
+    try {
+        await User.removeRating(req.params.username, req.params.imdbid);
+        return res.json({ deleted: imdbid });
+    } catch (err) {
+        return next(err);
+    }
+});
 
 module.exports = router;

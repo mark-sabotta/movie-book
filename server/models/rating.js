@@ -52,7 +52,7 @@ class Rating {
 
 
     /** Delete given user's movie rating from database; returns undefined. */
-    static async remove(imdbid, username){
+    static async remove(imdbid, username) {
         await pool.query(
             `DELETE FROM ratings
             WHERE username = ?

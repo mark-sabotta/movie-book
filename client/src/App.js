@@ -30,7 +30,7 @@ export const TOKEN_STORAGE_ID = "moviebook-token";
 function App() {
   const [infoLoaded, setInfoLoaded] = useState(false);
   const [movieRatingIds, setMovieRatingIds] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState({username: 'billy'});
   const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
 
   console.debug(
@@ -55,7 +55,10 @@ function App() {
           MovieBookApi.token = token;
           let currentUser = await MovieBookApi.getCurrentUser(username);
           setCurrentUser(currentUser);
-          setMovieRatingIds(new Set(currentUser.movieRatings));
+          if(currentUser){
+            setMovieRatingIds(new Set(currentUser.movieRatings));
+          }
+          
         } catch (err) {
           console.error("App loadUserInfo: problem loading", err);
           setCurrentUser(null);
@@ -75,6 +78,7 @@ function App() {
   function logout() {
     setCurrentUser(null);
     setToken(null);
+    setMovieRatingIds([]);
   }
 
   /** Handles site-wide signup.
@@ -111,7 +115,7 @@ function App() {
 
   /** Checks if a movie has been rated. */
   function hasRatedMovie(id) {
-    return movieRatingIds.has(id);
+   return movieRatingIds.has(id);
   }
 
   /** Rate movie: make API call and update set of movie rating IDs. */

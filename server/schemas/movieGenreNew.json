@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/movieGenreNew.schema.json",
+    "type": "object",
+    "properties": {
+        "genre": {
+            "type": "integer",
+            "minValue": 1,
+            "maxValue": 10800
+        },
+        "imdbid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 15
+        }
+    },
+    "additionalPropeties": false,
+    "required": [
+        "genre", "imdbid"
+    ]
+}

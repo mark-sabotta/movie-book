@@ -185,17 +185,17 @@ class User {
     /** Rate a movie: update db, returns undefined.
      *
      * - username: username rating movie
-     * - movieId: IMDB id
+     * - imdbid: IMDB id
      **/
 
-    static async rateMovie(username, movieId, rating) {
+    static async rateMovie(username, imdbid, rating) {
         const confirmMovie = await db.query(
-            `SELECT id
+            `SELECT imdbid
            FROM movies
-           WHERE id = ?`, [movieId]);
+           WHERE imdbid = ?`, [imdbid]);
         const movie = confirmMovie.rows[0];
 
-        if (!movie) throw new NotFoundError(`No movie: ${movieId}`);
+        if (!movie) throw new NotFoundError(`No movie: ${imdbid}`);
 
         const confirmUser = await db.query(
             `SELECT username
@@ -208,7 +208,18 @@ class User {
         await db.query(
             `INSERT INTO ratings (username, imdbid, rating)
            VALUES (?, ?, ?)`,
-            [username, movieId, rating]);
+            [username, imdbid, rating]);
+    }
+
+    /** Delete given user's movie rating from database; returns undefined. */
+    static async removeRating(imdbid, username){
+        await pool.query(
+            `DELETE FROM ratings
+            WHERE username = ?
+            AND imdbid = ?`,
+            [username, imdbid]
+        );
+
     }
 }
 

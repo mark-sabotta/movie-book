@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": [
+        "Search",
+        "totalResults",
+        "Response"
+    ],
+    "properties": {
+        "Search": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "Title",
+                    "Year",
+                    "imdbID",
+                    "Type",
+                    "Poster"
+                ],
+                "properties": {
+                    "Title": {
+                        "type": "string"
+                    },
+                    "Year": {
+                        "type": "string"
+                    },
+                    "imdbID": {
+                        "type": "string",
+                        "pattern": "^(tt[0-9]{7}|tt[0-9]{8})$"
+                    },
+                    "Type": {
+                        "type": "string",
+                        "enum": [
+                            "movie"
+                        ]
+                    },
+                    "Poster": {
+                        "type": "string",
+                        "oneOf": [ 
+                            {
+                                "format": "uri"
+                            },
+                            {
+                                "const": "N/A"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "totalResults": {
+            "type": "string"
+        },
+        "Response": {
+            "type": "string",
+            "enum": [
+                "True",
+                "False"
+            ]
+        }
+    }
+}

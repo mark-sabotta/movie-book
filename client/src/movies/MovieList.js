@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import SearchForm from "../common/SearchForm";
 import MovieBookApi from "../api/api";
 import MovieCard from "./MovieCard";
@@ -19,18 +19,18 @@ function MovieList() {
 
     const [movies, setMovies] = useState([]);
 
-    // useEffect(function getMoviesOnMount() {
-    //     console.debug("MovieList useEffect getMoviesOnMount");
-    //     search();
-    // }, []);
 
     /** Triggered by search form submit; reloads movies. */
     async function search(title) {
         let movies = await MovieBookApi.getMovies(title);
-        setMovies(movies);
+        if(movies.Response === "False") return;
+        MovieBookApi.addMoviesToDB(movies);
+        setMovies(movies.Search);
     }
 
     if (!movies) return <LoadingSpinner />;
+
+
 
     return (
         <div className="MovieList col-md-8 offset-md-2">
@@ -38,12 +38,12 @@ function MovieList() {
             {movies.length
                 ? (
                     <div className="MovieList-list">
-                        {movies.map(c => (
+                        {movies.map(m => (
                             <MovieCard
-                                key={c.imdbID}
-                                imdbid={c.imdbID}
-                                title={c.Title}
-                                image={c.Poster}
+                                key={m.imdbID}
+                                imdbid={m.imdbID}
+                                title={m.Title}
+                                image={m.Poster}
                             />
                         ))}
                     </div>
