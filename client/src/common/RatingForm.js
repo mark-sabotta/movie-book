@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { useHistory, withRouter } from "react-router-dom";
+import { useNavigate } from 'react-router-dom-v5-compat';
 import "./RatingForm.css";
 
 const RatingForm = ( { rate,  imdbid } ) => {
     const [score, setScore] = useState(0);
 
-    const { history } = useHistory();
 
     const handleStarClick = (newScore) => {
         setScore(newScore);
     };
+
+    const navigate = useNavigate();
+
     async function handleSubmit(evt) {
         evt.preventDefault();
         let result = await rate(imdbid, score);
-        history.push("/");
+        navigate("/");
         return result;
     }
 
@@ -35,4 +37,4 @@ const RatingForm = ( { rate,  imdbid } ) => {
     );
 };
 
-export default withRouter(RatingForm);
+export default RatingForm;
