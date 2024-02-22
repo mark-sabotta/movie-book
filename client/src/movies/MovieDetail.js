@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import UserContext from "../auth/UserContext";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, withRouter } from "react-router-dom";
 import MovieBookApi from "../api/api";
 import LoadingSpinner from "../common/LoadingSpinner";
 import RatingForm from "../common/RatingForm";
@@ -16,7 +15,6 @@ import RatingForm from "../common/RatingForm";
 
 function MovieDetail({ rate }) {
     const { imdbid } = useParams();
-    const { currentUser } = useContext(UserContext);
     console.debug("MovieDetail", "imdbid=", imdbid);
 
     const [movie, setMovie] = useState(null);
@@ -31,7 +29,6 @@ function MovieDetail({ rate }) {
 
     if (!movie) return <LoadingSpinner />;
 
-
     return (
         <div className="col-md-8 offset-md-2">
             <h2 className="text-center font-weight-bold">{movie.title}</h2>
@@ -39,10 +36,10 @@ function MovieDetail({ rate }) {
                         alt={movie.title}
                         className="float-left mr-5" />}
             <p>{movie.overview}</p>
-            <h3>Click a star to rate:</h3>
-            <RatingForm rate={rate} username={currentUser.username} imdbid={movie.imdbid} />
+            <h3>Click a star, then click rate:</h3>
+            <RatingForm rate={rate} imdbid={imdbid} />
         </div>
     )
 }
 
-export default MovieDetail;
+export default withRouter(MovieDetail);

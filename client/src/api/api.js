@@ -19,7 +19,6 @@ class MovieBookApi {
 
         try {
             const result = await axios({ url, method, data, params, headers });
-            console.log(result);
             return result.data;
         } catch (err) {
             console.error("API Error:", err.response);
@@ -65,7 +64,8 @@ class MovieBookApi {
 
     static async rateMovie(data){
         let res = await this.request(`ratings`, data, "post");
-        return res.user;
+        console.log("rateMovie", res);
+        return res;
     }
 
     /** Searches X-Rapid MovieDatabaseAlternative API  */

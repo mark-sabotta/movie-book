@@ -26,28 +26,38 @@ class Rating {
 
 
         if (duplicateCheck[0][0]) {
-            throw new BadRequestError(`Duplicate rating: ${username, imdbid}`);
-        }
-
-        await pool.query(
-            `INSERT INTO ratings
-           (username,
-            imdbid,
-            rating)
-           VALUES (?, ?, ?)`,
-            [
-                username,
+            await pool.query(
+                `UPDATE ratings
+                SET rating = ?
+                WHERE username = ? AND imdbid = ?`,
+                [
+                    score,
+                    username,
+                    imdbid,
+                ],
+            );
+        } else {
+            await pool.query(
+                `INSERT INTO ratings
+               (username,
                 imdbid,
-                score,
-            ],
-        );
+                rating)
+               VALUES (?, ?, ?)`,
+                [
+                    username,
+                    imdbid,
+                    score,
+                ],
+            );
+        }
 
         const ratingRes = await pool.query(
             `SELECT imdbid FROM ratings WHERE username = ? AND imdbid = ?`,
             [username, imdbid]
         );
-
+        console.log("rating.js", ratingRes[0][0]);
         return ratingRes[0][0];
+
     }
 
 

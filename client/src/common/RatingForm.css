@@ -1,6 +1,5 @@
 .rating-container {
     display: flex;
-    justify-content: space-between;
 }
 
 .rating-container span {
@@ -12,7 +11,6 @@
 
 .star {
     display: inline-block;
-    /* Ensures proper spacing between stars */
 }
 
 .rating-container .active {

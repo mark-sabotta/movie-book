@@ -119,10 +119,12 @@ function App() {
   }
 
   /** Rate movie: make API call and update set of movie rating IDs. */
-  function rateMovie(id, score) {
+  async function rateMovie(id, score) {
     if (hasRatedMovie(id)) return;
-    MovieBookApi.rateMovie(currentUser.username, id, score);
+    let result = await MovieBookApi.rateMovie({username: currentUser.username, imdbid: id, score: score});
     setMovieRatingIds(new Set([...movieRatingIds, id]));
+    
+    return result;
   }
 
   if (!infoLoaded) return <LoadingSpinner />;

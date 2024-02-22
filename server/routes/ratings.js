@@ -7,8 +7,8 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 const { ensureLoggedIn } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
-const Rating = require("../models/user");
-const rating = require("../schemas/rating.json")
+const Rating = require("../models/rating");
+const ratingSchema = require("../schemas/rating.json")
 
 const router = express.Router();
 
@@ -23,14 +23,14 @@ const router = express.Router();
 
 router.post("/", ensureLoggedIn, async function (req, res, next) {
     try {
-        const validator = jsonschema.validate(req.body, rating);
+        const validator = jsonschema.validate(req.body, ratingSchema);
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
             throw new BadRequestError(errs);
         }
-
-        const user = await Rating.rate(req.body);
-        return res.status(201).json({ user, token });
+        const imdbid = await Rating.rate(req.body);
+        console.log("ratings.js", imdbid)
+        return res.status(201).json({ imdbid });
     } catch (err) {
         return next(err);
     }
@@ -44,12 +44,12 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.delete("/delete", ensureLoggedIn, async function (req, res, next) {
     try {
-        const validator = jsonschema.validate(req.body, rating);
+        const validator = jsonschema.validate(req.body, ratingSchema);
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
             throw new BadRequestError(errs);
         }
-        
+
         await Rating.remove(req.body.imdbid, req.body.username);
         return res.json({ deleted: req.body.imdbid });
     } catch (err) {

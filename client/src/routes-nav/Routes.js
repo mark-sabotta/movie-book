@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
+import { Switch, Route, Redirect, withRouter } from "react-router-dom";
 import Homepage from "../homepage/Homepage";
 import LoginForm from "../auth/LoginForm";
 import SignupForm from "../auth/SignupForm";
@@ -54,4 +54,4 @@ function Routes({ login, signup, rate }) {
     );
 }
 
-export default Routes;
+export default withRouter(Routes);

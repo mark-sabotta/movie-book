@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useHistory } from "react-router-dom";
+import { useHistory, withRouter } from "react-router-dom";
 import "./RatingForm.css";
 
-const RatingForm = ({ rate, username, imdbid }) => {
+const RatingForm = ( { rate,  imdbid } ) => {
     const [score, setScore] = useState(0);
 
     const { history } = useHistory();
@@ -10,15 +10,11 @@ const RatingForm = ({ rate, username, imdbid }) => {
     const handleStarClick = (newScore) => {
         setScore(newScore);
     };
-
     async function handleSubmit(evt) {
         evt.preventDefault();
-        let result = await rate({ username: username, imdbid: imdbid, score: score });
-        if (result.success) {
-            history.push("/");
-        } else {
-            console.log(result.errors);
-        }
+        let result = await rate(imdbid, score);
+        history.push("/");
+        return result;
     }
 
     return (
@@ -39,4 +35,4 @@ const RatingForm = ({ rate, username, imdbid }) => {
     );
 };
 
-export default RatingForm;
+export default withRouter(RatingForm);
