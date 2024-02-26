@@ -34,6 +34,8 @@ function authenticateJWT(req, res, next) {
  */
 
 function ensureLoggedIn(req, res, next) {
+    console.log("ELI");
+    console.log(req.params);
     try {
         if (!res.locals.user) throw new UnauthorizedError();
         return next();

@@ -29,8 +29,8 @@ export const TOKEN_STORAGE_ID = "moviebook-token";
 
 function App() {
   const [infoLoaded, setInfoLoaded] = useState(false);
-  const [movieRatingIds, setMovieRatingIds] = useState([]);
-  const [currentUser, setCurrentUser] = useState({username: 'billy'});
+  const [movieRatings, setMovieRatings] = useState({});
+  const [currentUser, setCurrentUser] = useState({ username: 'billy' });
   const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
 
   console.debug(
@@ -47,6 +47,20 @@ function App() {
   useEffect(function loadUserInfo() {
     console.debug("App useEffect loadUserInfo", "token=", token);
 
+    /** Updates the state when the user rates a movie */
+
+    function handleMovieRating(imdbid, title, poster, rating) {
+      setMovieRatings(prevRatings => ({
+        ...prevRatings,
+        [imdbid]: {
+          title,
+          poster,
+          rating,
+        },
+      }));
+    };
+
+
     async function getCurrentUser() {
       if (token) {
         try {
@@ -55,10 +69,14 @@ function App() {
           MovieBookApi.token = token;
           let currentUser = await MovieBookApi.getCurrentUser(username);
           setCurrentUser(currentUser);
-          if(currentUser){
-            setMovieRatingIds(new Set(currentUser.movieRatings));
+          if (currentUser) {
+            let currentRatings = await MovieBookApi.getUserRatings(username);
+            for (let i = 0; i < currentRatings.movies.length; i++) {
+              let movie = currentRatings.movies[i];
+              handleMovieRating(movie.imdbid, movie.title, movie.poster, movie.rating);
+            }
           }
-          
+
         } catch (err) {
           console.error("App loadUserInfo: problem loading", err);
           setCurrentUser(null);
@@ -78,7 +96,7 @@ function App() {
   function logout() {
     setCurrentUser(null);
     setToken(null);
-    setMovieRatingIds([]);
+    setMovieRatings({});
   }
 
   /** Handles site-wide signup.
@@ -113,18 +131,40 @@ function App() {
     }
   }
 
-  /** Checks if a movie has been rated. */
+  /** Checks if a movie has been rated by checking if the id is in movieRatings. */
   function hasRatedMovie(id) {
-   return movieRatingIds.has(id);
+    return id in movieRatings;
   }
 
+
+
   /** Rate movie: make API call and update set of movie rating IDs. */
-  async function rateMovie(id, score) {
-    if (hasRatedMovie(id)) return;
-    let result = await MovieBookApi.rateMovie({username: currentUser.username, imdbid: id, score: score});
-    setMovieRatingIds(new Set([...movieRatingIds, id]));
-    
-    return result;
+  async function rateMovie(imdbid, score) {
+    try {
+      // Early return for already rated movie
+      if (hasRatedMovie(imdbid)) {
+        return;
+      }
+  
+      // Make both API calls concurrently
+      const [ratingResult, movieData] = await Promise.all([
+        MovieBookApi.rateMovie({
+          username: currentUser.username,
+          imdbid: imdbid,
+          score: score,
+        }),
+        MovieBookApi.getMovie(imdbid),
+      ]);
+  
+      // Handle the movie rating internally
+      this.handleMovieRating(imdbid, movieData.title, movieData.poster, score);
+  
+      return ratingResult; // Return the API response
+    } catch (error) {
+      // Handle errors gracefully
+      console.error("Error rating movie:", error);
+      throw error; // Re-throw to allow higher-level error handling
+    }
   }
 
   if (!infoLoaded) return <LoadingSpinner />;
@@ -139,7 +179,7 @@ function App() {
           value={{ currentUser, setCurrentUser }}>
           <div>
             <Navigation logout={logout} />
-            <Routes login={login} signup={signup} rate={rateMovie}/>
+            <Routes login={login} signup={signup} rate={rateMovie} movieRatings={movieRatings} />
           </div>
         </UserContext.Provider>
       </CompatRouter>

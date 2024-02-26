@@ -55,7 +55,6 @@ class Rating {
             `SELECT imdbid FROM ratings WHERE username = ? AND imdbid = ?`,
             [username, imdbid]
         );
-        console.log("rating.js", ratingRes[0][0]);
         return ratingRes[0][0];
 
     }

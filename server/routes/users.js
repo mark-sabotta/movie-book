@@ -8,6 +8,7 @@ const express = require("express");
 const { ensureLoggedIn } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
+const Movie = require("../models/movie");
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
@@ -102,6 +103,25 @@ router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
     }
 });
 
+/** GET /[username]/ratings => { user }
+ *
+ * Returns { username, ratings }
+ *   where ratings is { movie_id, rating }
+ *
+ * Authorization required: same user-as-:username
+ **/
+
+ router.get("/:username/ratings", ensureLoggedIn, async function (req, res, next) {
+    console.log(req.params);
+    
+    try {
+        const movies = await User.getAllRatedMovies(req.params.username);
+        return res.json({ movies });
+    } catch (err) {
+        return next(err);
+    }
+});
+
 
 /** POST /[username]/ratings/[imdbid]/[score]  { movie } => { rating }
  *
@@ -136,6 +156,18 @@ router.delete("/:username/ratings/delete/:imdbid", ensureLoggedIn, async functio
         return res.json({ deleted: imdbid });
     } catch (err) {
         return next(err);
+    }
+});
+
+//this shouldn't stay here
+router.get("/movie/:imdbid", ensureLoggedIn, async function (res, req, next) {
+    const imdbid = req.params.imdbid;
+
+    try {
+        const movie = await Movie.get(imdbid);
+        res.json(movie); // Send the movie back as a JSON response
+    } catch (err) {
+        next(err); // Handle errors appropriately
     }
 });
 

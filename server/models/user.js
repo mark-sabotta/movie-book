@@ -221,6 +221,20 @@ class User {
         );
 
     }
+
+    /** Selects imdbid, title, poster-url, and ratings from ratings table;
+     *  Returns all selected data.
+     */
+    static async getAllRatedMovies(username){
+        const ratedMovies = await pool.query(
+            `SELECT m.imdbid, m.title, m.poster, rating
+            FROM ratings
+            JOIN movies AS m ON ratings.imdbid = m.imdbid
+            WHERE username = ?; `,
+            [username]
+        );
+        return ratedMovies[0];
+    }
 }
 
 

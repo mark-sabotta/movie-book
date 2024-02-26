@@ -29,7 +29,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
             throw new BadRequestError(errs);
         }
         const imdbid = await Rating.rate(req.body);
-        console.log("ratings.js", imdbid)
         return res.status(201).json({ imdbid });
     } catch (err) {
         return next(err);

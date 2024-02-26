@@ -10,19 +10,43 @@ import "./UserMovieCard.css";
  * Homepage -> UserMovieCard
  */
 
-function UserMovieCard({ title, image, imdbid, rating }) {
-    console.debug("UserMovieCard", image);
+function UserMovieCard({ title, image, imdbid, rating = "false" }) {
+
+    // Conditional logic for image display
+    const displayImage = image !== "N/A";
+    if(title.length > 20) title = title.slice(0,17) + "...";
+
+    if (rating !== "false") {
+        const litStars = Math.min(Math.floor(rating), 5);
+        let starRating = "";
+        for (let i = 0; i < 5; i++) {
+            starRating += i < litStars ? "⭐" : "☆";
+        }
+
+        return (
+            <a className="UserMovieCard card" href={`/movies/${imdbid}`}>
+                <div className="user-card-body">
+                    <h6 className="user-card-title">
+                        {title}
+                    </h6>
+                    {displayImage && <img src={image}
+                        alt={title} className="" />}
+                    <p><small>{starRating}</small></p>
+                </div>
+            </a>
+        );
+    }
 
     return (
-        <a className="MovieCard card" href={`/movies/${imdbid}`}>
-            <div className="card-body">
-                <h6 className="card-title">
+        <a className="UserMovieCard card" href={`/movies/${imdbid}`}>
+            <div className="user-card-body">
+                <h6 className="user-card-title">
                     {title}
-                    {image && <img src={image}
-                        alt={title}
-                        className="float-right ml-5" />}
                 </h6>
-                <p><small>⭐⭐⭐★★</small></p>
+                {image && <img src={image}
+                    alt={title}
+                    className="" />}
+                <p><small>Learn more</small></p>
             </div>
         </a>
     );

@@ -18,6 +18,7 @@ class MovieBookApi {
             : {};
 
         try {
+            console.log("url:", url, "method:", method, "params:", params, "data:", data, "headers:", headers);
             const result = await axios({ url, method, data, params, headers });
             return result.data;
         } catch (err) {
@@ -60,12 +61,29 @@ class MovieBookApi {
         return res.Search;
     }
 
+    /** Sends username and returns all user's rated movies from database */
+
+    static async getUserRatings(username, data){
+        console.log("api:66", username);
+        console.log("api:67", data);
+        let res = await this.request(`users/${username}/ratings`, data, "get");
+        return res;
+    }
+
     /** Sends user's rating of a movie to be added to the database */
 
     static async rateMovie(data){
         let res = await this.request(`ratings`, data, "post");
-        console.log("rateMovie", res);
         return res;
+    }
+
+    /** Sends imdbid returns movie's poster and title from the database */
+
+    static async getMovie(imdbid, data){
+        console.log("api:82", imdbid);
+        console.log("api:83", data);
+        let res = await this.request(`movies/${imdbid}`);
+        return res.movie;
     }
 
     /** Searches X-Rapid MovieDatabaseAlternative API  */

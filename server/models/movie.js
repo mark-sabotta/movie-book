@@ -48,6 +48,23 @@ class Movie {
 
         return movie;
     }
+
+    /** Finds the movie in the database with the given imdbid
+     * 
+     * Returns its poster url and title
+     */
+
+    static async get( imdbid ){
+        console.log("movie.js get imdbid:", imdbid);
+        const movieRes = await pool.query(
+            `SELECT poster, title FROM movies WHERE imdbid = ?`,
+            [imdbid]
+        );
+
+        const movie = movieRes[0][0];
+
+        return movie;
+    }
 }
 
 module.exports = Movie;

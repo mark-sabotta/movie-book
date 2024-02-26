@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import UserMovieCard from "../movies/UserMovieCard";
 import "./Homepage.css";
 import UserContext from "../auth/UserContext";
-import MovieCard from "../movies/MovieCard";
 
 /** Homepage of site.
  *
@@ -14,15 +13,15 @@ import MovieCard from "../movies/MovieCard";
  * Routes -> Homepage
  */
 
-function Homepage() {
+function Homepage({ movieRatings }) {
     const { currentUser } = useContext(UserContext);
-    const userMovies = {};
     console.debug("Homepage", "currentUser=", currentUser);
+    console.debug("Movie ratings in HP", movieRatings);
 
     return (
         <div className="Homepage">
             <div className="container text-center">
-        
+
                 {currentUser
                     ?
                     <div>
@@ -33,32 +32,30 @@ function Homepage() {
                         <h3>Rate movies to get recommended more:</h3> <a href="/movies">Search for movies</a>
                         <br />
                         <h3>Your ratings:</h3>
-                        <div className="MovieList col-md-8 offset-md-2">
-                            {userMovies.length
-                                ? (
-                                    <div className="MovieList-list">
-                                        {userMovies.map(c => (
-                                            <UserMovieCard
-                                                key={c.imdbID}
-                                                imdbid={c.imdbID}
-                                                title={c.Title}
-                                                image={c.Poster}
-                                                rating={c.rating}
-                                            />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="lead">No movies rated yet</p>
-                                )}
+                        <div className="userMovieList col-md-8 offset-md-2">
+                            {Object.entries(movieRatings).map(([imdbid, movieData]) => ( // Use Object.entries
+                                <UserMovieCard
+                                    key={imdbid} // Use imdbid as key
+                                    imdbid={imdbid}
+                                    title={movieData.title} // Access title from movieData object
+                                    image={movieData.poster}
+                                    rating={movieData.rating}
+                                />
+                            ))}
+                            {movieRatings.length === 0 && ( // Check for empty object
+                                <p className="lead">No movies rated yet</p>
+                            )}
                         </div>
-                        
+
 
                         <h2>We recommended:</h2>
-                        <MovieCard 
-                            title = "Shrek"
-                            imdbid={"tt0126029"}
-                            image="https://m.media-amazon.com/images/M/MV5BOGZhM2FhNTItODAzNi00YjA0LWEyN2UtNjJlYWQzYzU1MDg5L2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
-                        />
+                        <div className="userMovieList col-md-8 offset-md-2">
+                            <UserMovieCard
+                                title="Shrek"
+                                imdbid={"tt0126029"}
+                                image="https://m.media-amazon.com/images/M/MV5BOGZhM2FhNTItODAzNi00YjA0LWEyN2UtNjJlYWQzYzU1MDg5L2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+                            />
+                        </div>
                     </div>
                     : (
                         <p>
