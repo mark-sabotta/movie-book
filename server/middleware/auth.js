@@ -38,6 +38,8 @@ function ensureLoggedIn(req, res, next) {
     console.log(req.params);
     try {
         if (!res.locals.user) throw new UnauthorizedError();
+        console.log("safe");
+        console.log(req.params)
         return next();
     } catch (err) {
         return next(err);

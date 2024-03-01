@@ -63,7 +63,7 @@ class MovieBookApi {
 
     /** Sends username and returns all user's rated movies from database */
 
-    static async getUserRatings(username, data){
+    static async getUserRatings(username, data) {
         console.log("api:66", username);
         console.log("api:67", data);
         let res = await this.request(`users/${username}/ratings`, data, "get");
@@ -72,17 +72,17 @@ class MovieBookApi {
 
     /** Sends user's rating of a movie to be added to the database */
 
-    static async rateMovie(data){
+    static async rateMovie(data) {
         let res = await this.request(`ratings`, data, "post");
-        return res;
+        return res.movie;
     }
 
     /** Sends imdbid returns movie's poster and title from the database */
 
-    static async getMovie(imdbid, data){
+    static async getMovie(imdbid, data) {
         console.log("api:82", imdbid);
         console.log("api:83", data);
-        let res = await this.request(`movies/${imdbid}`);
+        let res = await this.request(`movies/${imdbid}`, { "imdbid": imdbid }, "get");
         return res.movie;
     }
 
@@ -132,9 +132,27 @@ class MovieBookApi {
         }
     }
 
-}
 
+    static async getRecommendedMovies(genre_id) {
+        const url = env.THE_MOVIE_DB_DISCOVER_URL + genre_id;
+        const options = {
+            method: 'GET',
+            url: url,
+            headers: {
+                accept: 'application/json',
+                Authorization: env.THE_MOVIE_DB_AUTH
+            }
+        };
 
+        try {
+            const response = await axios.request(options);
+            return (response.data.results[0]);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+};
 
 
 export default MovieBookApi;

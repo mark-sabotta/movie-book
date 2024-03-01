@@ -10,7 +10,7 @@ const movieListSchema = require("../schemas/movieList.json");
 const imdbidSchema = require("../schemas/imdbid.json");
 const { BadRequestError } = require("../expressError");
 
-const router = new express.Router();
+const router = express.Router();
 
 /** POST /movies
  * 
@@ -21,6 +21,8 @@ const router = new express.Router();
  **/
 
 router.post("/", ensureLoggedIn, async function (req, res, next) {
+    console.log("post");
+    
     try {
         const validator = jsonschema.validate(req.body, movieListSchema);
 
@@ -44,7 +46,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
     }
 });
 
-/** GET movies/:imdbid
+/** GET movies/imdbid
  * 
  * Searches the database for the specified movie by imdbid
  * 
@@ -52,7 +54,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/:imdbid", async function (res, req, next) {
-
     try {
         const movie = await Movie.get(req.params.imdbid);
         console.log(movie);

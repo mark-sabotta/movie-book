@@ -44,22 +44,59 @@ function App() {
   // this should not run. It only needs to re-run when a user logs out, so
   // the value of the token is a dependency for this effect.
 
+  function handleMovieRating(imdbid, title, poster, rating) {
+    setMovieRatings(prevRatings => ({
+      ...prevRatings,
+      [imdbid]: {
+        title,
+        poster,
+        rating,
+      },
+    }));
+  };
+
+  async function getRecommendedGenres(movieList) {
+    const genreMap = {};
+    for (let imdbid in movieList) {
+      if (movieList[imdbid].rating >= 3) {
+        const movie = await MovieBookApi.getMovieGenre(imdbid);
+        for (let i = 0; i < movie.genre_ids.length; i++) {
+          genreMap[movie.genre_ids[i]] += imdbid.rating;
+        }
+      }
+    }
+    const recommendedGenres = Object.keys(genreMap);
+    recommendedGenres.sort((a, b) => genreMap[a] > genreMap[b]);
+    return recommendedGenres;
+  }
+
+  async function getRecommendedMovies(recommendedGenres){
+    if (recommendedGenres.length > 0) {
+        let x = 0;
+        const recommendedMovies = [];
+        let genreIndex = 0;
+        while (x < 3 && genreIndex < recommendedGenres.length) {
+            let genre_id = recommendedGenres[genreIndex];
+            let currList = await MovieBookApi.getRecommendedMovies(genre_id);
+                while(currList.length > 0 && x < 3){
+                    let movie = currList.shift();
+                    if(!(movie.imdbid in movieRatings)){
+                        recommendedMovies.push({imdbid: movie.imdbid, title: movie.title, image: movie.poster});
+                        x++;
+                    }
+                }
+            genreIndex++;
+        }
+        console.log(recommendedMovies);
+        return recommendedMovies;
+    }
+    return [];
+}
+
   useEffect(function loadUserInfo() {
     console.debug("App useEffect loadUserInfo", "token=", token);
 
     /** Updates the state when the user rates a movie */
-
-    function handleMovieRating(imdbid, title, poster, rating) {
-      setMovieRatings(prevRatings => ({
-        ...prevRatings,
-        [imdbid]: {
-          title,
-          poster,
-          rating,
-        },
-      }));
-    };
-
 
     async function getCurrentUser() {
       if (token) {
@@ -145,20 +182,19 @@ function App() {
       if (hasRatedMovie(imdbid)) {
         return;
       }
-  
+
       // Make both API calls concurrently
-      const [ratingResult, movieData] = await Promise.all([
+      const ratingResult = await
         MovieBookApi.rateMovie({
           username: currentUser.username,
           imdbid: imdbid,
           score: score,
-        }),
-        MovieBookApi.getMovie(imdbid),
-      ]);
-  
+        });
+      console.log("rR", ratingResult);
       // Handle the movie rating internally
-      this.handleMovieRating(imdbid, movieData.title, movieData.poster, score);
-  
+      handleMovieRating(imdbid, ratingResult.title,
+        ratingResult.poster, score);
+
       return ratingResult; // Return the API response
     } catch (error) {
       // Handle errors gracefully
@@ -179,7 +215,9 @@ function App() {
           value={{ currentUser, setCurrentUser }}>
           <div>
             <Navigation logout={logout} />
-            <Routes login={login} signup={signup} rate={rateMovie} movieRatings={movieRatings} />
+            <Routes login={login} signup={signup} rate={rateMovie}
+              movieRatings={movieRatings} getRecommendedGenres={getRecommendedGenres}
+              getRecommendedMovies={getRecommendedMovies} />
           </div>
         </UserContext.Provider>
       </CompatRouter>

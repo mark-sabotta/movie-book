@@ -8,7 +8,8 @@ const express = require("express");
 const { ensureLoggedIn } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const Rating = require("../models/rating");
-const ratingSchema = require("../schemas/rating.json")
+const ratingSchema = require("../schemas/rating.json");
+const Movie = require("../models/movie");
 
 const router = express.Router();
 
@@ -29,7 +30,9 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
             throw new BadRequestError(errs);
         }
         const imdbid = await Rating.rate(req.body);
-        return res.status(201).json({ imdbid });
+        const movie = await Movie.get(imdbid);
+        console.log("post ratings", movie);
+        return res.status(201).json({ movie });
     } catch (err) {
         return next(err);
     }

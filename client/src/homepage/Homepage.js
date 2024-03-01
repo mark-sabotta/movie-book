@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import UserMovieCard from "../movies/UserMovieCard";
 import "./Homepage.css";
 import UserContext from "../auth/UserContext";
+import MovieBookApi from "../api/api";
 
 /** Homepage of site.
  *
@@ -13,10 +14,23 @@ import UserContext from "../auth/UserContext";
  * Routes -> Homepage
  */
 
-function Homepage({ movieRatings }) {
+function Homepage({ movieRatings, getRecommendedGenres, getRecommendedMovies }) {
     const { currentUser } = useContext(UserContext);
     console.debug("Homepage", "currentUser=", currentUser);
     console.debug("Movie ratings in HP", movieRatings);
+    const recommendedGenres = getRecommendedGenres(movieRatings);
+    console.log("the list", recommendedGenres);
+    
+    
+    
+    const recommendedMovies = getRecommendedGenres(recommendedGenres);
+    
+
+
+    
+    
+    
+
 
     return (
         <div className="Homepage">
@@ -28,8 +42,12 @@ function Homepage({ movieRatings }) {
                         <h4>
                             Welcome Back, {currentUser.username}!
                         </h4>
-                        <hr></hr>
-                        <h3>Rate movies to get recommended more:</h3> <a href="/movies">Search for movies</a>
+                        <hr />
+                        <div className="Rating-Link">
+                            <h3>Rate movies to get recommended more:</h3>
+                            <a href="/movies">Search for movies</a>
+                        </div>
+                        <hr />
                         <br />
                         <h3>Your ratings:</h3>
                         <div className="userMovieList col-md-8 offset-md-2">
@@ -50,11 +68,17 @@ function Homepage({ movieRatings }) {
 
                         <h2>We recommended:</h2>
                         <div className="userMovieList col-md-8 offset-md-2">
-                            <UserMovieCard
-                                title="Shrek"
-                                imdbid={"tt0126029"}
-                                image="https://m.media-amazon.com/images/M/MV5BOGZhM2FhNTItODAzNi00YjA0LWEyN2UtNjJlYWQzYzU1MDg5L2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
-                            />
+                        {recommendedMovies.map((movie) => (
+                                <UserMovieCard
+                                    key={movie.imdbid} // Use imdbid as key
+                                    imdbid={movie.imdbid}
+                                    title={movie.title} // Access title from movieData object
+                                    image={movie.poster}
+                                />
+                            ))}
+                            {recommendedMovies.length === 0 && (
+                                <p className="lead">Rate movies to get recommendations</p>
+                            )}
                         </div>
                     </div>
                     : (

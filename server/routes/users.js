@@ -112,6 +112,7 @@ router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
  **/
 
  router.get("/:username/ratings", ensureLoggedIn, async function (req, res, next) {
+    console.log("get username/ratings");
     console.log(req.params);
     
     try {

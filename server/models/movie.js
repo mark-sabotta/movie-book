@@ -14,7 +14,7 @@ class Movie {
      * returns early if duplicate is found
      */
 
-    static async add( imdbid, title, poster ) {
+    static async add(imdbid, title, poster) {
         const duplicateCheck = await pool.query(
             `SELECT imdbid
            FROM movies
@@ -54,16 +54,49 @@ class Movie {
      * Returns its poster url and title
      */
 
-    static async get( imdbid ){
-        console.log("movie.js get imdbid:", imdbid);
+    static async get(imdbid) {
+        console.log("movie.js get imdbid:", imdbid.imdbid);
         const movieRes = await pool.query(
             `SELECT poster, title FROM movies WHERE imdbid = ?`,
-            [imdbid]
+            [imdbid.imdbid]
         );
 
         const movie = movieRes[0][0];
 
         return movie;
+    }
+
+    static async addGenre(imdbid, genre_id) {
+        const duplicateCheck = await pool.query(
+            `SELECT id FROM movie_genres WHERE imdbid = ? AND genre_id= ?`,
+            [imdbid, genre_id]
+        );
+
+        if (duplicateCheck[0][0]) {
+            return { imdbid: imdbid }
+        }
+
+        await pool.query(
+            `INSERT INTO movie_genres (imdbid, genre) VALUES (?, ?)`,
+            [imdbid, genre_id]
+        );
+
+        const genreRes = await pool.query(
+            `SELECT id FROM movie_genres WHERE imdbid = ? AND genre_id= ?`,
+            [imdbid, genre_id]
+        );
+
+
+        return genreRes[0][0];
+    }
+
+    static async getGenres(imdbid){
+        const genreList = await pool.query(
+            `SELECT genre_id FROM movie_genres WHERE imdbid = ?`,
+            [imdbid]
+        );
+
+        return genreList[0];
     }
 }
 

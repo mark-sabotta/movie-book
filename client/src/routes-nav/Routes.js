@@ -16,7 +16,7 @@ import MovieDetail from "../movies/MovieDetail";
  * Visiting a non-existant route redirects to the homepage.
  */
 
-function Routes({ login, signup, rate, movieRatings }) {
+function Routes({ login, signup, rate, movieRatings, getRecommendedGenres, getRecommendedMovies }) {
     console.debug(
         "Routes",
         `login=${typeof login}`,
@@ -29,7 +29,9 @@ function Routes({ login, signup, rate, movieRatings }) {
             <Switch>
                 {/* Conditional rendering for routes */}
                 <Route exact path="/">
-                    <Homepage movieRatings={movieRatings}/>
+                    <Homepage movieRatings={movieRatings}
+                    getRecommendedGenres={getRecommendedGenres}
+                    getRecommendedMovies={getRecommendedMovies} />
                 </Route>
 
                 <Route exact path="/login">
