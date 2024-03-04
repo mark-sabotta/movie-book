@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import UserMovieCard from "../movies/UserMovieCard";
 import "./Homepage.css";
 import UserContext from "../auth/UserContext";
-import MovieBookApi from "../api/api";
 
 /** Homepage of site.
  *
@@ -14,22 +13,11 @@ import MovieBookApi from "../api/api";
  * Routes -> Homepage
  */
 
-function Homepage({ movieRatings, getRecommendedGenres, getRecommendedMovies }) {
+function Homepage({ movieRatings, recommendedMovies }) {
     const { currentUser } = useContext(UserContext);
     console.debug("Homepage", "currentUser=", currentUser);
     console.debug("Movie ratings in HP", movieRatings);
-    const recommendedGenres = getRecommendedGenres(movieRatings);
-    console.log("the list", recommendedGenres);
-    
-    
-    
-    const recommendedMovies = getRecommendedGenres(recommendedGenres);
-    
-
-
-    
-    
-    
+    console.debug("HP recs", recommendedMovies);
 
 
     return (
@@ -68,17 +56,17 @@ function Homepage({ movieRatings, getRecommendedGenres, getRecommendedMovies }) 
 
                         <h2>We recommended:</h2>
                         <div className="userMovieList col-md-8 offset-md-2">
-                        {recommendedMovies.map((movie) => (
-                                <UserMovieCard
-                                    key={movie.imdbid} // Use imdbid as key
-                                    imdbid={movie.imdbid}
-                                    title={movie.title} // Access title from movieData object
-                                    image={movie.poster}
-                                />
-                            ))}
-                            {recommendedMovies.length === 0 && (
-                                <p className="lead">Rate movies to get recommendations</p>
+                            {recommendedMovies.length > 0 && (
+                                Object.entries(recommendedMovies).map(([imdbid, movieData]) => (
+                                    <UserMovieCard
+                                        key={imdbid} // Use imdbid as key
+                                        imdbid={imdbid}
+                                        title={movieData.title} // Access title from movieData object
+                                        image={movieData.poster}
+                                    />
+                                ))
                             )}
+                                <p className="lead">Rate movies to start getting recommendations!</p>
                         </div>
                     </div>
                     : (
