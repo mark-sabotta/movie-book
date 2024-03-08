@@ -146,7 +146,26 @@ class MovieBookApi {
 
         try {
             const response = await axios.request(options);
-            return (response.data.results[0]);
+            return (response.data.results);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    static async getIMDBID(tmdb_id) {
+        const url = env.THE_MOVIE_DB_ID_SWAP + tmdb_id + "?language=en-US";
+        const options = {
+            method: 'GET',
+            url: url,
+            headers: {
+                accept: 'application/json',
+                Authorization: env.THE_MOVIE_DB_AUTH
+            }
+        };
+
+        try {
+            const response = await axios.request(options);
+            return (response.data);
         } catch (error) {
             console.error(error);
         }

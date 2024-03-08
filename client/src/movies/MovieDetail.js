@@ -3,6 +3,7 @@ import { useParams, withRouter } from "react-router-dom";
 import MovieBookApi from "../api/api";
 import LoadingSpinner from "../common/LoadingSpinner";
 import RatingForm from "../common/RatingForm";
+import env from "../env";
 
 /** Company Detail page.
  *
@@ -15,17 +16,32 @@ import RatingForm from "../common/RatingForm";
 
 function MovieDetail({ rate }) {
     const { imdbid } = useParams();
-    console.debug("MovieDetail", "imdbid=", imdbid);
-
     const [movie, setMovie] = useState(null);
+    console.debug("MovieDetail", "imdbid=", imdbid, "movie=", movie);
 
     useEffect(function getMovieGenres() {
         async function getMovie() {
             setMovie(await MovieBookApi.getMovieGenre(imdbid));
         }
 
-        getMovie();
+        getMovie();      
     }, [imdbid]);
+
+    useEffect(function ensureMovieIsRated() {
+        async function addMovie(movie){
+            console.log({Search: [{Title: movie.title, imdbID: imdbid, 
+                Poster: env.THE_MOVIE_DB_POSTER_BASE + movie.poster_path}], totalResults: "1"});
+            await MovieBookApi.addMoviesToDB({Search: [{Title: movie.title, imdbID: imdbid, 
+                Poster: env.THE_MOVIE_DB_POSTER_BASE + movie.poster_path}], totalResults: "1"})
+        }
+
+        if(movie){
+            console.log("yo");
+            addMovie(movie);
+        }
+
+
+    }, [movie, imdbid]);
 
     if (!movie) return <LoadingSpinner />;
 

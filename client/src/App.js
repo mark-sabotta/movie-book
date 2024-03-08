@@ -8,6 +8,7 @@ import MovieBookApi from "./api/api";
 import UserContext from "./auth/UserContext";
 import { jwtDecode } from "jwt-decode";
 import { BrowserRouter } from "react-router-dom";
+import env from "./env";
 
 // Key name for storing token in localStorage for "remember me" re-login
 export const TOKEN_STORAGE_ID = "moviebook-token";
@@ -57,44 +58,9 @@ function App() {
     }));
   };
 
-  async function getRecommendedGenres() {
-    console.log("gRG", movieRatings);
-    const genreMap = {};
-    for (let imdbid in movieRatings) {
-      if (movieRatings[imdbid].rating >= 3) {
-        const movie = await MovieBookApi.getMovieGenre(imdbid);
-        for (let i = 0; i < movie.genre_ids.length; i++) {
-          genreMap[movie.genre_ids[i]] += imdbid.rating;
-        }
-      }
-    }
-    const recommendedGenres = Object.keys(genreMap);
-    recommendedGenres.sort((a, b) => genreMap[a] > genreMap[b]);
-    setRecommendedGenres(recommendedGenres);
-  }
 
-  async function getRecommendedMovies() {
-    console.log("gRM runs", Object.entries(recommendedGenres));
-    if (Object.entries(recommendedGenres).length > 0) {
-      let x = 0;
-      const recommendedMovies = [];
-      let genreIndex = 0;
-      while (x < 3 && genreIndex < recommendedGenres.length) {
-        let genre_id = recommendedGenres[genreIndex];
-        let currList = await MovieBookApi.getRecommendedMovies(genre_id);
-        while (currList.length > 0 && x < 3) {
 
-          let movie = currList.shift();
-          if (!(movie.imdbid in movieRatings)) {
-            recommendedMovies.push({ imdbid: movie.imdbid, title: movie.title, image: movie.poster });
-            x++;
-          }
-        }
-        genreIndex++;
-      }
-      setRecommendedMovies(recommendedMovies);
-    }
-  }
+
 
   useEffect(function loadUserInfo() {
     console.debug("App useEffect loadUserInfo", "token=", token);
@@ -110,21 +76,12 @@ function App() {
           let currentUser = await MovieBookApi.getCurrentUser(username);
           setCurrentUser(currentUser);
           if (currentUser) {
-            MovieBookApi.getUserRatings(username)
-              .then(currentRatings => {
-                for (let i = 0; i < currentRatings.movies.length; i++) {
-                  const movie = currentRatings.movies[i];
-                  handleMovieRating(movie.imdbid, movie.title, movie.poster, movie.rating);
-                }
-                return getRecommendedGenres();
-              })
-              .then(getRecommendedMovies)
-              .catch(err => {
-                console.error("Error fetching ratings or recommendations:", err);
-              });
+            const currentRatings = await MovieBookApi.getUserRatings(username);
+            for (let i = 0; i < currentRatings.movies.length; i++) {
+              const movie = currentRatings.movies[i];
+              handleMovieRating(movie.imdbid, movie.title, movie.poster, movie.rating);
+            }
           }
-
-
         } catch (err) {
           console.error("App loadUserInfo: problem loading", err);
           setCurrentUser(null);
@@ -132,13 +89,77 @@ function App() {
       }
       setInfoLoaded(true);
     }
-
     // set infoLoaded to false while async getCurrentUser runs; once the
     // data is fetched (or even if an error happens!), this will be set back
     // to false to control the spinner.
     setInfoLoaded(false);
     getCurrentUser();
   }, [token]);
+
+  useEffect(function recommendGenres() {
+    async function getRecommendedGenres() {
+      console.log("gRG", movieRatings);
+      const genreMap = {};
+      for (let imdbid in movieRatings) {
+        if (movieRatings[imdbid].rating >= 3) {
+          const movie = await MovieBookApi.getMovieGenre(imdbid);
+          for (let i = 0; i < movie.genre_ids.length; i++) {
+            genreMap[movie.genre_ids[i]] += imdbid.rating;
+          }
+        }
+      }
+      const recommendedGenres = Object.keys(genreMap);
+      recommendedGenres.sort((a, b) => genreMap[a] > genreMap[b]);
+      setRecommendedGenres(recommendedGenres);
+    }
+
+    if (Object.keys(movieRatings).length > 0) {
+      setInfoLoaded(false);
+      getRecommendedGenres();
+      setInfoLoaded(true);
+    }
+  }, [movieRatings]);
+
+  useEffect(function recommendedMovies() {
+
+    async function getRecommendedMovies() {
+      if (recommendedGenres.length > 0) {
+        let x = 0;
+        const recommendedMovies = {};
+        let genreIndex = 0;
+        while (x < 3 && genreIndex < recommendedGenres.length) {
+          let genre_id = recommendedGenres[genreIndex];
+          let currList = await MovieBookApi.getRecommendedMovies(genre_id);
+          while (currList.length > 0 && x < 3) {
+            let movie = currList.shift();
+            let movieImdbid = await MovieBookApi.getIMDBID(movie.id);
+            if (!(movieImdbid.imdb_id in movieRatings)) {
+              await MovieBookApi.addMoviesToDB({
+                Search: [{
+                  Title: movieImdbid.title, imdbID: movieImdbid.imdb_id,
+                  Poster: env.THE_MOVIE_DB_POSTER_BASE + movieImdbid.poster_path
+                }], totalResults: "1"
+              });
+              recommendedMovies[movieImdbid.imdb_id] = {
+                title: movieImdbid.original_title,
+                poster: env.THE_MOVIE_DB_POSTER_BASE + movieImdbid.poster_path
+              };
+              x++;
+            }
+          }
+          genreIndex++;
+        }
+        setRecommendedMovies(recommendedMovies);
+      }
+    }
+    if (recommendedGenres.length > 0) {
+      setInfoLoaded(false);
+      getRecommendedMovies();
+      setInfoLoaded(true);
+    }
+  }, [recommendedGenres, movieRatings]);
+
+
 
   /** Handles site-wide logout. */
   function logout() {
@@ -193,6 +214,7 @@ function App() {
     try {
       // Early return for already rated movie
       if (hasRatedMovie(imdbid)) {
+        //Create a function to update a rating instead
         return;
       }
 
@@ -203,24 +225,17 @@ function App() {
           imdbid: imdbid,
           score: score,
         });
-      console.log("rR", ratingResult);
       // Handle the movie rating internally
-      handleMovieRating(imdbid, ratingResult.title,
-        ratingResult.poster, score);
-      if(Object.keys(movieRatings).length > 0){
-        getRecommendedGenres();
-      }
-        
-      if (recommendedMovies[imdbid]) {
-        setRecommendedMovies({});
-        await getRecommendedMovies();
+      const currentRatings = await MovieBookApi.getUserRatings(currentUser.username);
+      for (let i = 0; i < currentRatings.movies.length; i++) {
+        const movie = currentRatings.movies[i];
+        handleMovieRating(movie.imdbid, movie.title, movie.poster, movie.rating);
       }
 
       return ratingResult; // Return the API response
     } catch (error) {
-      // Handle errors gracefully
       console.error("Error rating movie:", error);
-      throw error; // Re-throw to allow higher-level error handling
+      throw error;
     }
   }
 

@@ -3,8 +3,7 @@
     "type": "object",
     "required": [
         "Search",
-        "totalResults",
-        "Response"
+        "totalResults"
     ],
     "properties": {
         "Search": {
@@ -13,27 +12,16 @@
                 "type": "object",
                 "required": [
                     "Title",
-                    "Year",
                     "imdbID",
-                    "Type",
                     "Poster"
                 ],
                 "properties": {
                     "Title": {
                         "type": "string"
                     },
-                    "Year": {
-                        "type": "string"
-                    },
                     "imdbID": {
                         "type": "string",
                         "pattern": "^(tt[0-9]{7}|tt[0-9]{8})$"
-                    },
-                    "Type": {
-                        "type": "string",
-                        "enum": [
-                            "movie"
-                        ]
                     },
                     "Poster": {
                         "type": "string",
@@ -51,13 +39,6 @@
         },
         "totalResults": {
             "type": "string"
-        },
-        "Response": {
-            "type": "string",
-            "enum": [
-                "True",
-                "False"
-            ]
         }
     }
 }

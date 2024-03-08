@@ -21,8 +21,6 @@ const router = express.Router();
  **/
 
 router.post("/", ensureLoggedIn, async function (req, res, next) {
-    console.log("post");
-    
     try {
         const validator = jsonschema.validate(req.body, movieListSchema);
 
@@ -56,7 +54,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 router.get("/:imdbid", async function (res, req, next) {
     try {
         const movie = await Movie.get(req.params.imdbid);
-        console.log(movie);
         res.json({ movie }); // Send the movie back as a JSON response
     } catch (err) {
         next(err); // Handle errors appropriately

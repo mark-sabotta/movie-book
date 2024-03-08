@@ -39,11 +39,11 @@ function Homepage({ movieRatings, recommendedMovies }) {
                         <br />
                         <h3>Your ratings:</h3>
                         <div className="userMovieList col-md-8 offset-md-2">
-                            {Object.entries(movieRatings).map(([imdbid, movieData]) => ( // Use Object.entries
+                            {Object.entries(movieRatings).map(([imdbid, movieData]) => ( 
                                 <UserMovieCard
                                     key={imdbid} // Use imdbid as key
                                     imdbid={imdbid}
-                                    title={movieData.title} // Access title from movieData object
+                                    title={movieData.title} 
                                     image={movieData.poster}
                                     rating={movieData.rating}
                                 />
@@ -56,17 +56,16 @@ function Homepage({ movieRatings, recommendedMovies }) {
 
                         <h2>We recommended:</h2>
                         <div className="userMovieList col-md-8 offset-md-2">
-                            {recommendedMovies.length > 0 && (
-                                Object.entries(recommendedMovies).map(([imdbid, movieData]) => (
+                                {Object.entries(recommendedMovies).map(([imdbid, movieData]) => (
                                     <UserMovieCard
                                         key={imdbid} // Use imdbid as key
                                         imdbid={imdbid}
                                         title={movieData.title} // Access title from movieData object
                                         image={movieData.poster}
                                     />
-                                ))
-                            )}
-                                <p className="lead">Rate movies to start getting recommendations!</p>
+                                ))}
+                            
+                                <p className="lead">Rate movies to start getting or change recommendations!</p>
                         </div>
                     </div>
                     : (

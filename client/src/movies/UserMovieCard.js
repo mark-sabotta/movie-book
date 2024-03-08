@@ -10,14 +10,14 @@ import "./UserMovieCard.css";
  * Homepage -> UserMovieCard
  */
 
-function UserMovieCard({ title, image, imdbid, rating = "false" }) {
+function UserMovieCard({ title="Title Not Found", image, imdbid, rating = "false" }) {
 
     // Conditional logic for image display
     const displayImage = image !== "N/A";
     if(title.length > 20) title = title.slice(0,17) + "...";
 
     if (rating !== "false") {
-        const litStars = Math.min(Math.floor(rating), 5);
+        const litStars = rating;
         let starRating = "";
         for (let i = 0; i < 5; i++) {
             starRating += i < litStars ? "⭐" : "☆";
@@ -30,7 +30,8 @@ function UserMovieCard({ title, image, imdbid, rating = "false" }) {
                         {title}
                     </h6>
                     {displayImage && <img src={image}
-                        alt={title} className="" />}
+                        alt={title} 
+                        className="" />}
                     <p><small>{starRating}</small></p>
                 </div>
             </a>
@@ -43,7 +44,7 @@ function UserMovieCard({ title, image, imdbid, rating = "false" }) {
                 <h6 className="user-card-title">
                     {title}
                 </h6>
-                {image && <img src={image}
+                {displayImage && <img src={image}
                     alt={title}
                     className="" />}
                 <p><small>Learn more</small></p>

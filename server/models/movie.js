@@ -11,42 +11,24 @@ class Movie {
      * 
      * returns { imdbid }
      * 
-     * returns early if duplicate is found
+     * updates if duplicate is found
      */
 
     static async add(imdbid, title, poster) {
-        const duplicateCheck = await pool.query(
-            `SELECT imdbid
-           FROM movies
-           WHERE imdbid = ?`,
-            [imdbid]
-        );
+        const insertQuery = `
+          INSERT INTO movies (imdbid, title, poster)
+          VALUES (?, ?, ?)
+          ON DUPLICATE KEY UPDATE title = VALUES(title), poster = VALUES(poster)
+        `;
 
-        if (duplicateCheck[0][0]) {
-            return { imdbid: imdbid }
+        try {
+            await pool.query(insertQuery, [imdbid, title, poster]);
+        } catch (error) {
+            console.error("Error adding movie:", error);
+            throw error; 
         }
 
-        await pool.query(
-            `INSERT INTO movies
-           (imdbid,
-            title,
-            poster)
-           VALUES (?, ?, ?)`,
-            [
-                imdbid,
-                title,
-                poster,
-            ],
-        );
-
-        const movieRes = await pool.query(
-            `SELECT imdbid FROM movies WHERE imdbid = ?`,
-            [imdbid]
-        );
-
-        const movie = movieRes[0][0];
-
-        return movie;
+        return { imdbid: imdbid }; 
     }
 
     /** Finds the movie in the database with the given imdbid
@@ -55,13 +37,12 @@ class Movie {
      */
 
     static async get(imdbid) {
-        console.log("movie.js get imdbid:", imdbid.imdbid);
         const movieRes = await pool.query(
             `SELECT poster, title FROM movies WHERE imdbid = ?`,
             [imdbid.imdbid]
         );
-
-        const movie = movieRes[0][0];
+        console.log(movieRes);
+        const movie = movieRes[0];
 
         return movie;
     }
@@ -90,7 +71,7 @@ class Movie {
         return genreRes[0][0];
     }
 
-    static async getGenres(imdbid){
+    static async getGenres(imdbid) {
         const genreList = await pool.query(
             `SELECT genre_id FROM movie_genres WHERE imdbid = ?`,
             [imdbid]
