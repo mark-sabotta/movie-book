@@ -111,10 +111,7 @@ router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: same user-as-:username
  **/
 
- router.get("/:username/ratings", ensureLoggedIn, async function (req, res, next) {
-    console.log("get username/ratings");
-    console.log(req.params);
-    
+router.get("/:username/ratings", ensureLoggedIn, async function (req, res, next) {
     try {
         const movies = await User.getAllRatedMovies(req.params.username);
         return res.json({ movies });

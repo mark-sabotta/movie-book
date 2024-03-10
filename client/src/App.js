@@ -8,10 +8,10 @@ import MovieBookApi from "./api/api";
 import UserContext from "./auth/UserContext";
 import { jwtDecode } from "jwt-decode";
 import { BrowserRouter } from "react-router-dom";
-import env from "./env";
 
 // Key name for storing token in localStorage for "remember me" re-login
 export const TOKEN_STORAGE_ID = "moviebook-token";
+const THE_MOVIE_DB_POSTER_BASE = 'https://image.tmdb.org/t/p/original';
 
 /** MovieBook application.
  *
@@ -36,13 +36,6 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
 
-  console.debug(
-    "App",
-    "infoLoaded=", infoLoaded,
-    "currentUser=", currentUser,
-    "token=", token,
-  );
-
   // Load user info from API. Until a user is logged in and they have a token,
   // this should not run. It only needs to re-run when a user logs out, so
   // the value of the token is a dependency for this effect.
@@ -63,7 +56,7 @@ function App() {
 
 
   useEffect(function loadUserInfo() {
-    console.debug("App useEffect loadUserInfo", "token=", token);
+    //console.debug("App useEffect loadUserInfo", "token=", token);
 
     /** Updates the state when the user rates a movie */
 
@@ -98,13 +91,14 @@ function App() {
 
   useEffect(function recommendGenres() {
     async function getRecommendedGenres() {
-      console.log("gRG", movieRatings);
+      if (!movieRatings) return;
+
       const genreMap = {};
       for (let imdbid in movieRatings) {
-        if (movieRatings[imdbid].rating >= 3) {
-          const movie = await MovieBookApi.getMovieGenre(imdbid);
-          for (let i = 0; i < movie.genre_ids.length; i++) {
-            genreMap[movie.genre_ids[i]] += imdbid.rating;
+        if (movieRatings[imdbid]?.rating >= 3) {
+          const movie = await MovieBookApi.getMovieGenre(imdbid) || {};
+          for (let i = 0; i < movie.movie.genre_ids?.length; i++) {
+            genreMap[movie.movie.genre_ids[i]] += imdbid.rating;
           }
         }
       }
@@ -135,14 +129,16 @@ function App() {
             let movieImdbid = await MovieBookApi.getIMDBID(movie.id);
             if (!(movieImdbid.imdb_id in movieRatings)) {
               await MovieBookApi.addMoviesToDB({
-                Search: [{
-                  Title: movieImdbid.title, imdbID: movieImdbid.imdb_id,
-                  Poster: env.THE_MOVIE_DB_POSTER_BASE + movieImdbid.poster_path
-                }], totalResults: "1"
+                movieList: {
+                  Search: [{
+                    Title: movieImdbid.movie.title, imdbID: movieImdbid.movie.imdb_id,
+                    Poster: THE_MOVIE_DB_POSTER_BASE + movieImdbid.movie.poster_path
+                  }], totalResults: "1"
+                }
               });
-              recommendedMovies[movieImdbid.imdb_id] = {
-                title: movieImdbid.original_title,
-                poster: env.THE_MOVIE_DB_POSTER_BASE + movieImdbid.poster_path
+              recommendedMovies[movieImdbid.movie.imdb_id] = {
+                title: movieImdbid.movie.original_title,
+                poster: THE_MOVIE_DB_POSTER_BASE + movieImdbid.movie.poster_path
               };
               x++;
             }

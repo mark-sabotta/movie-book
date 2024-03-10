@@ -41,7 +41,6 @@ class Movie {
             `SELECT poster, title FROM movies WHERE imdbid = ?`,
             [imdbid.imdbid]
         );
-        console.log(movieRes);
         const movie = movieRes[0];
 
         return movie;

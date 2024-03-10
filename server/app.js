@@ -4,6 +4,8 @@
 
 const express = require("express");
 const cors = require("cors");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const { NotFoundError } = require("./expressError");
 
@@ -30,13 +32,11 @@ app.use("/movies", movieRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
-    console.log("app33", req.params);
     return next(new NotFoundError());
 });
 
 /** Generic error handler; anything unhandled goes here. */
 app.use(function (err, req, res, next) {
-    console.log("app39", req.params);
     if (process.env.NODE_ENV !== "test") console.error(err.stack);
     const status = err.status || 500;
     const message = err.message;

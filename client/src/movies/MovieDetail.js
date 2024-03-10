@@ -3,7 +3,7 @@ import { useParams, withRouter } from "react-router-dom";
 import MovieBookApi from "../api/api";
 import LoadingSpinner from "../common/LoadingSpinner";
 import RatingForm from "../common/RatingForm";
-import env from "../env";
+const THE_MOVIE_DB_POSTER_BASE = 'https://image.tmdb.org/t/p/original';
 
 /** Company Detail page.
  *
@@ -17,11 +17,11 @@ import env from "../env";
 function MovieDetail({ rate }) {
     const { imdbid } = useParams();
     const [movie, setMovie] = useState(null);
-    console.debug("MovieDetail", "imdbid=", imdbid, "movie=", movie);
 
     useEffect(function getMovieGenres() {
         async function getMovie() {
-            setMovie(await MovieBookApi.getMovieGenre(imdbid));
+            const movieObj = await MovieBookApi.getMovieGenre(imdbid);
+            setMovie(movieObj.movie);
         }
 
         getMovie();      
@@ -29,14 +29,11 @@ function MovieDetail({ rate }) {
 
     useEffect(function ensureMovieIsRated() {
         async function addMovie(movie){
-            console.log({Search: [{Title: movie.title, imdbID: imdbid, 
-                Poster: env.THE_MOVIE_DB_POSTER_BASE + movie.poster_path}], totalResults: "1"});
-            await MovieBookApi.addMoviesToDB({Search: [{Title: movie.title, imdbID: imdbid, 
-                Poster: env.THE_MOVIE_DB_POSTER_BASE + movie.poster_path}], totalResults: "1"})
+            await MovieBookApi.addMoviesToDB({movieList:{Search: [{Title: movie.title, imdbID: imdbid, 
+                Poster: THE_MOVIE_DB_POSTER_BASE + movie.poster_path}], totalResults: "1"}});
         }
 
         if(movie){
-            console.log("yo");
             addMovie(movie);
         }
 

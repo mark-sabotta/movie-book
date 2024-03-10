@@ -15,17 +15,15 @@ import LoadingSpinner from "../common/LoadingSpinner";
  */
 
 function MovieList() {
-    console.debug("MovieList");
-
     const [movies, setMovies] = useState([]);
 
 
     /** Triggered by search form submit; reloads movies. */
     async function search(title) {
-        let movies = await MovieBookApi.getMovies(title);
-        if(movies.Response === "False") return;
-        MovieBookApi.addMoviesToDB(movies);
-        setMovies(movies.Search);
+        let movieList = await MovieBookApi.getMovies(title);
+        if(movieList.Response === "False") return;
+        MovieBookApi.addMoviesToDB({movieList: movieList.movieList});
+        setMovies(movieList.movieList.Search);
     }
 
     if (!movies) return <LoadingSpinner />;

@@ -31,7 +31,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
         }
         const imdbid = await Rating.rate(req.body);
         const movie = await Movie.get(imdbid);
-        console.log("post ratings", movie);
         return res.status(201).json({ movie });
     } catch (err) {
         return next(err);
