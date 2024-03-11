@@ -1,0 +1,12 @@
+{
+    "workspaces": [
+        "client",
+        "server"
+    ],
+    "scripts": {
+        "install:deps": "npm install --workspace client && npm install --workspace server",
+        "start:server": "node server/server.js",
+        "start:client": "npm start --prefix client",
+        "start": "npm run-script start:server concurrently start:client"
+    }
+}
