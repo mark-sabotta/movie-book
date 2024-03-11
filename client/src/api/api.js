@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-const BASE_URL = "http://localhost:3001";
+const API_URL = process.env.BACKEND_URL || "http://localhost:3001";
 
 class MovieBookApi {
     // the token for interaction with the API will be stored here.
