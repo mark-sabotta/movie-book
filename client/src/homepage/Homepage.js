@@ -15,9 +15,7 @@ import UserContext from "../auth/UserContext";
 
 function Homepage({ movieRatings, recommendedMovies }) {
     const { currentUser } = useContext(UserContext);
-    console.debug("Homepage", "currentUser=", currentUser);
-    console.debug("Movie ratings in HP", movieRatings);
-    console.debug("HP recs", recommendedMovies);
+
 
 
     return (

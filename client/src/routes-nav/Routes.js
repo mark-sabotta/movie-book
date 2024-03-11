@@ -17,13 +17,6 @@ import MovieDetail from "../movies/MovieDetail";
  */
 
 function Routes({ login, signup, rate, movieRatings, recommendedMovies }) {
-    console.debug(
-        "Routes",
-        `login=${typeof login}`,
-        `signup=${typeof signup}`,
-        `rate=${typeof rate}`,
-    );
-
     return (
         <div className="pt-5">
             <Switch>
