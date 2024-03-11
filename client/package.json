@@ -1,5 +1,5 @@
 {
-  "name": "movie-book",
+  "name": "movie-book-client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
