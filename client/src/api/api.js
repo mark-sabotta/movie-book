@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-const BASE_URL = process.env.BACKEND_URL || "http://localhost:3001";
+const REACT_APP_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001";
 
 class MovieBookApi {
     // the token for interaction with the API will be stored here.
@@ -9,7 +9,7 @@ class MovieBookApi {
 
 
     static async request(endpoint, data = {}, method = "get") {
-        const url = `${BASE_URL}/${endpoint}`;
+        const url = `${REACT_APP_API_BASE_URL}/${endpoint}`;
         const headers = { Authorization: `Bearer ${MovieBookApi.token}` };
         const params = (method === "get")
             ? data
