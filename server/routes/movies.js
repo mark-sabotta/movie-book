@@ -91,7 +91,7 @@ router.get("/tmdb/discover", ensureLoggedIn, async function (req, res, next) {
     }
 });
 
-router.get("/tmdb/imdbid", ensureLoggedIn, async function (req, res, next) {
+router.get("/tmdb/imdbid", async function (req, res, next) {
     try {
         const movie = await WebAPI.getIMDBID(req.query.tmdb_id);
         return res.json({ movie });
