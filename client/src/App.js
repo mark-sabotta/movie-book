@@ -33,7 +33,7 @@ function App() {
   const [movieRatings, setMovieRatings] = useState({});
   const [recommendedGenres, setRecommendedGenres] = useState([]);
   const [recommendedMovies, setRecommendedMovies] = useState({});
-  const [currentUser, setCurrentUser] = useState({});
+  const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
 
   // Load user info from API. Until a user is logged in and they have a token,
