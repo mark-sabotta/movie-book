@@ -10,7 +10,6 @@ import "./MovieCard.css";
  */
 
 function MovieCard({ title, image, imdbid }) {
-    console.debug("MovieCard", image);
 
     return (
         <a className="MovieCard card" href={`/movies/${imdbid}`}>
