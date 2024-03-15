@@ -18,8 +18,8 @@ Get personalized recommendations based on your ratings and similar user choices.
 
 For detailed technical information about the frontend and backend components, refer to the dedicated READMEs:
 
-* Client-side code: [/client/README.md](https://github.com/mark-sabotta/movie-book/client/README.md)
-* Server-side code: [/server/README.md](https://github.com/mark-sabotta/movie-book/server/README.md)
+* Client-side code: [/client/README.md](https://github.com/mark-sabotta/movie-book/blob/main/client/README.md)
+* Server-side code: [/server/README.md](https://github.com/mark-sabotta/movie-book/blob/main/server/README.md)
 
 **Live Demo:**
 
