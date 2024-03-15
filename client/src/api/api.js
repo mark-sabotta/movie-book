@@ -1,8 +1,6 @@
 import axios from "axios";
 
-
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001";
-
 
 class MovieBookApi {
     // the token for interaction with the API will be stored here.

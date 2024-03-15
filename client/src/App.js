@@ -30,11 +30,12 @@ const THE_MOVIE_DB_POSTER_BASE = 'https://image.tmdb.org/t/p/original';
 
 function App() {
   const [infoLoaded, setInfoLoaded] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
   const [movieRatings, setMovieRatings] = useState({});
   const [recommendedGenres, setRecommendedGenres] = useState([]);
   const [recommendedMovies, setRecommendedMovies] = useState({});
-  const [currentUser, setCurrentUser] = useState(null);
-  const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
+
 
   // Load user info from API. Until a user is logged in and they have a token,
   // this should not run. It only needs to re-run when a user logs out, so
@@ -50,8 +51,6 @@ function App() {
       },
     }));
   };
-
-
 
 
 
@@ -235,7 +234,7 @@ function App() {
     }
   }
 
-  if (!infoLoaded) return <LoadingSpinner />;
+  if (!infoLoaded) return <LoadingSpinner />
 
 
 

@@ -22,9 +22,23 @@ function Homepage({ movieRatings, recommendedMovies }) {
         <div className="Homepage">
             <div className="container text-center">
 
-                {currentUser
-                    ?
+                {!currentUser
+                ?
+                (
                     <div>
+                        <h1>Welcome to Movie Book</h1>
+                        <Link className="btn btn-primary font-weight-bold mr-3"
+                            to="/login">
+                            Log in
+                        </Link>
+                        <Link className="btn btn-primary font-weight-bold"
+                            to="/signup">
+                            Sign up
+                        </Link>
+                    </div>
+                ) :
+                    
+                    (<div>
                         <h4>
                             Welcome Back, {currentUser.username}!
                         </h4>
@@ -53,7 +67,9 @@ function Homepage({ movieRatings, recommendedMovies }) {
 
 
                         <h2>We recommended:</h2>
-                        <div className="userMovieList col-md-8 offset-md-2">
+                        
+                        {recommendedMovies ?
+                        (<div className="userMovieList col-md-8 offset-md-2">
                                 {Object.entries(recommendedMovies).map(([imdbid, movieData]) => (
                                     <UserMovieCard
                                         key={imdbid} // Use imdbid as key
@@ -62,22 +78,12 @@ function Homepage({ movieRatings, recommendedMovies }) {
                                         image={movieData.poster}
                                     />
                                 ))}
-                            
-                                <p className="lead">Rate movies to start getting or change recommendations!</p>
-                        </div>
-                    </div>
-                    : (
-                        <p>
-                            <Link className="btn btn-primary font-weight-bold mr-3"
-                                to="/login">
-                                Log in
-                            </Link>
-                            <Link className="btn btn-primary font-weight-bold"
-                                to="/signup">
-                                Sign up
-                            </Link>
-                        </p>
-                    )}
+                        </div>)
+
+                        : (<p className="lead">Rate more movies to start getting recommendations!</p>)}
+
+                    </div>)
+                    }
             </div>
         </div>
     );
