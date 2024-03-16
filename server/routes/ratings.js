@@ -38,12 +38,14 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 });
 
 
-/** DELETE /ratings/delete {imdbid, username}  =>  { deleted: imdbid }
+/** DELETE /ratings/:imdbid { username}  =>  { deleted: imdbid }
  *
  * Authorization required: same-user-as-username
  **/
 
-router.delete("/delete", ensureLoggedIn, async function (req, res, next) {
+
+
+router.delete("/:imdbid", ensureLoggedIn, async function (req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, ratingSchema);
         if (!validator.valid) {
@@ -51,11 +53,10 @@ router.delete("/delete", ensureLoggedIn, async function (req, res, next) {
             throw new BadRequestError(errs);
         }
 
-        await Rating.remove(req.body.imdbid, req.body.username);
-        return res.json({ deleted: req.body.imdbid });
+        await Rating.remove(req.params.imdbid, req.body.username);
+        return res.json({ deleted: req.params.imdbid });
     } catch (err) {
         return next(err);
     }
 });
-
 module.exports = router;

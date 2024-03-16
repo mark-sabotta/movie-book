@@ -157,16 +157,6 @@ router.delete("/:username/ratings/delete/:imdbid", ensureLoggedIn, async functio
     }
 });
 
-//this shouldn't stay here
-router.get("/movie/:imdbid", ensureLoggedIn, async function (res, req, next) {
-    const imdbid = req.params.imdbid;
 
-    try {
-        const movie = await Movie.get(imdbid);
-        res.json(movie); // Send the movie back as a JSON response
-    } catch (err) {
-        next(err); // Handle errors appropriately
-    }
-});
 
 module.exports = router;
